@@ -1,0 +1,327 @@
+[gd_scene format=3 uid="uid://ylww7nh4qfm0"]
+
+[ext_resource type="Script" uid="uid://df8pf2dyl6w3d" path="res://ui.gd" id="1_fyqef"]
+
+[node name="UI" type="Control" unique_id=1042370251]
+process_priority = 1
+z_index = 20
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_fyqef")
+supplylimit = 2
+
+[node name="UI_buttons" type="ColorRect" parent="." unique_id=147199771]
+z_index = -1
+layout_mode = 0
+offset_left = 592.0
+offset_top = 448.0
+offset_right = 1152.0
+offset_bottom = 648.0
+color = Color(0.32354832, 0.32354832, 0.32354832, 1)
+
+[node name="move" type="Button" parent="UI_buttons" unique_id=1337661427]
+layout_mode = 0
+offset_right = 140.0
+offset_bottom = 100.0
+text = "move"
+autowrap_mode = 2
+
+[node name="build" type="Button" parent="UI_buttons" unique_id=540504699]
+layout_mode = 0
+offset_top = 100.0
+offset_right = 140.0
+offset_bottom = 200.0
+text = "build"
+autowrap_mode = 2
+
+[node name="create warrior" type="Button" parent="UI_buttons" unique_id=272220097]
+layout_mode = 0
+offset_top = 100.0
+offset_right = 140.0
+offset_bottom = 200.0
+text = "train warrior
+50 lumber, 2 supply"
+autowrap_mode = 2
+
+[node name="create worker" type="Button" parent="UI_buttons" unique_id=1667470259]
+layout_mode = 0
+offset_top = 100.0
+offset_right = 140.0
+offset_bottom = 200.0
+text = "train worker
+25 lumber, 1 supply"
+autowrap_mode = 2
+
+[node name="create archer" type="Button" parent="UI_buttons" unique_id=522316892]
+layout_mode = 0
+offset_left = 140.0
+offset_top = 100.0
+offset_right = 280.0
+offset_bottom = 200.0
+text = "train archer
+60 lumber, 2 supply"
+autowrap_mode = 2
+
+[node name="create cavalry" type="Button" parent="UI_buttons" unique_id=1100289093]
+layout_mode = 0
+offset_left = 280.0
+offset_top = 100.0
+offset_right = 420.0
+offset_bottom = 200.0
+text = "train cavalry
+75 lumber, 3 supply"
+autowrap_mode = 2
+
+[node name="cancel" type="Button" parent="UI_buttons" unique_id=1391859113]
+layout_mode = 0
+offset_left = 420.0
+offset_top = 100.0
+offset_right = 560.0
+offset_bottom = 200.0
+text = "cancel"
+autowrap_mode = 2
+
+[node name="continue building" type="Button" parent="UI_buttons" unique_id=218673716]
+layout_mode = 0
+offset_left = 420.0
+offset_top = 100.0
+offset_right = 560.0
+offset_bottom = 200.0
+text = "multibuild
+resume building"
+autowrap_mode = 2
+
+[node name="attack" type="Button" parent="UI_buttons" unique_id=1162059837]
+layout_mode = 0
+offset_left = 140.0
+offset_right = 280.0
+offset_bottom = 100.0
+text = "attack"
+autowrap_mode = 2
+
+[node name="gather" type="Button" parent="UI_buttons" unique_id=525077345]
+layout_mode = 0
+offset_left = 140.0
+offset_top = 100.0
+offset_right = 280.0
+offset_bottom = 200.0
+text = "gather"
+autowrap_mode = 2
+
+[node name="return" type="Button" parent="UI_buttons" unique_id=1627709719]
+layout_mode = 0
+offset_left = 280.0
+offset_top = 100.0
+offset_right = 420.0
+offset_bottom = 200.0
+text = "return"
+autowrap_mode = 2
+
+[node name="stop" type="Button" parent="UI_buttons" unique_id=381378273]
+layout_mode = 0
+offset_left = 280.0
+offset_right = 420.0
+offset_bottom = 100.0
+text = "stop"
+autowrap_mode = 2
+
+[node name="defend" type="Button" parent="UI_buttons" unique_id=1623062482]
+layout_mode = 0
+offset_left = 420.0
+offset_right = 560.0
+offset_bottom = 100.0
+text = "stay"
+autowrap_mode = 2
+
+[node name="rally" type="Button" parent="UI_buttons" unique_id=1664201481]
+layout_mode = 0
+offset_left = 420.0
+offset_right = 560.0
+offset_bottom = 100.0
+text = "rally"
+autowrap_mode = 2
+
+[node name="dropoff point" type="Button" parent="UI_buttons" unique_id=280522636]
+layout_mode = 0
+offset_right = 140.0
+offset_bottom = 100.0
+disabled = true
+text = "dropoff point"
+autowrap_mode = 2
+
+[node name="create" type="Control" parent="UI_buttons" unique_id=1361969146]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="UI_text" type="ColorRect" parent="." unique_id=1939305375]
+z_index = -1
+layout_mode = 0
+offset_top = 448.0
+offset_right = 560.0
+offset_bottom = 648.0
+color = Color(0.32354832, 0.32354832, 0.32354832, 1)
+
+[node name="unit" type="Label" parent="UI_text" unique_id=1836950915]
+layout_mode = 0
+offset_right = 360.0
+offset_bottom = 100.0
+theme_override_font_sizes/font_size = 32
+text = "unit: "
+autowrap_mode = 2
+
+[node name="hp" type="Label" parent="UI_text" unique_id=228872315]
+layout_mode = 0
+offset_top = 100.0
+offset_right = 360.0
+offset_bottom = 200.0
+theme_override_font_sizes/font_size = 32
+text = "health: "
+autowrap_mode = 2
+
+[node name="next" type="Button" parent="UI_text" unique_id=573317629]
+layout_mode = 0
+offset_top = -50.0
+offset_right = 280.0
+text = "next unit"
+
+[node name="dragin" type="Button" parent="UI_text" unique_id=164152292]
+layout_mode = 0
+offset_left = 280.0
+offset_top = -50.0
+offset_right = 560.0
+text = "move cam"
+
+[node name="indicator" type="ColorRect" parent="UI_text" unique_id=300342123]
+z_index = 20
+layout_mode = 0
+offset_right = 560.0
+offset_bottom = 25.0
+color = Color(1, 1, 0, 1)
+
+[node name="stats" type="Control" parent="." unique_id=1251046728]
+z_index = -1
+anchors_preset = 0
+offset_right = 50.0
+offset_bottom = 40.0
+
+[node name="lumber" type="Label" parent="stats" unique_id=978453610]
+layout_mode = 0
+offset_right = 350.0
+offset_bottom = 90.0
+theme_override_font_sizes/font_size = 32
+text = "lumber: "
+
+[node name="supply" type="Label" parent="stats" unique_id=963829029]
+layout_mode = 0
+offset_top = 50.0
+offset_right = 350.0
+offset_bottom = 140.0
+theme_override_font_sizes/font_size = 32
+text = "lumber: "
+
+[node name="error" type="Label" parent="stats" unique_id=1112454876]
+layout_mode = 0
+offset_top = 100.0
+offset_right = 350.0
+offset_bottom = 250.0
+theme_override_font_sizes/font_size = 32
+autowrap_mode = 2
+
+[node name="UI_buttons_build" type="ColorRect" parent="." unique_id=358292207]
+visible = false
+layout_mode = 0
+offset_left = 592.0
+offset_top = 448.0
+offset_right = 1152.0
+offset_bottom = 648.0
+color = Color(0.32354832, 0.32354832, 0.32354832, 1)
+
+[node name="build barracks" type="Button" parent="UI_buttons_build" unique_id=2029973753]
+layout_mode = 0
+offset_top = 100.0
+offset_right = 140.0
+offset_bottom = 200.0
+text = "build barracks
+150 lumber"
+autowrap_mode = 2
+
+[node name="back" type="Button" parent="UI_buttons_build" unique_id=508201206]
+layout_mode = 0
+offset_left = 420.0
+offset_top = 100.0
+offset_right = 560.0
+offset_bottom = 200.0
+text = "cancel"
+autowrap_mode = 2
+
+[node name="build command centre" type="Button" parent="UI_buttons_build" unique_id=1000764766]
+layout_mode = 0
+offset_right = 140.0
+offset_bottom = 100.0
+text = "build command centre 
+450 lumber, +10 supply"
+autowrap_mode = 2
+
+[node name="build farm" type="Button" parent="UI_buttons_build" unique_id=1267151831]
+layout_mode = 0
+offset_left = 140.0
+offset_right = 280.0
+offset_bottom = 100.0
+text = "build farm
+100 lumber, +8 supply"
+autowrap_mode = 2
+
+[node name="UI_buttons_cancel" type="ColorRect" parent="." unique_id=1480274414]
+visible = false
+layout_mode = 0
+offset_left = 592.0
+offset_top = 448.0
+offset_right = 1152.0
+offset_bottom = 648.0
+color = Color(0.32354832, 0.32354832, 0.32354832, 1)
+
+[node name="cancel" type="Button" parent="UI_buttons_cancel" unique_id=409298860]
+layout_mode = 0
+offset_left = 420.0
+offset_top = 100.0
+offset_right = 560.0
+offset_bottom = 200.0
+text = "cancel"
+autowrap_mode = 2
+
+[node name="selectmult" type="Button" parent="." unique_id=1194811943]
+layout_mode = 0
+offset_left = 592.0
+offset_top = 398.0
+offset_right = 1152.0
+offset_bottom = 448.0
+text = "select multiple "
+
+[connection signal="pressed" from="UI_buttons/move" to="." method="_move"]
+[connection signal="pressed" from="UI_buttons/build" to="." method="_on_build_pressed"]
+[connection signal="pressed" from="UI_buttons/create warrior" to="." method="_on_create_warrior_pressed"]
+[connection signal="pressed" from="UI_buttons/create worker" to="." method="_on_create_worker_pressed"]
+[connection signal="pressed" from="UI_buttons/create archer" to="." method="_on_create_archer_pressed"]
+[connection signal="pressed" from="UI_buttons/create cavalry" to="." method="_on_create_cavalry_pressed"]
+[connection signal="pressed" from="UI_buttons/cancel" to="." method="_on_cancel_pressed"]
+[connection signal="pressed" from="UI_buttons/continue building" to="." method="_on_continue_building_pressed"]
+[connection signal="pressed" from="UI_buttons/attack" to="." method="_on_attack_pressed"]
+[connection signal="pressed" from="UI_buttons/gather" to="." method="_on_gather_pressed"]
+[connection signal="pressed" from="UI_buttons/return" to="." method="_on_return_pressed"]
+[connection signal="pressed" from="UI_buttons/stop" to="." method="_on_stop_pressed"]
+[connection signal="pressed" from="UI_buttons/defend" to="." method="_on_defend_pressed"]
+[connection signal="pressed" from="UI_buttons/rally" to="." method="_on_rally_pressed"]
+[connection signal="pressed" from="UI_text/next" to="." method="_on_next_pressed"]
+[connection signal="pressed" from="UI_text/dragin" to="." method="_on_dragin_pressed"]
+[connection signal="pressed" from="UI_buttons_build/build barracks" to="." method="_on_build_barracks_pressed"]
+[connection signal="pressed" from="UI_buttons_build/back" to="." method="_on_back_pressed"]
+[connection signal="pressed" from="UI_buttons_build/build command centre" to="." method="_on_build_command_centre_pressed"]
+[connection signal="pressed" from="UI_buttons_build/build farm" to="." method="_on_build_farm_pressed"]
+[connection signal="pressed" from="UI_buttons_cancel/cancel" to="." method="_on_cancel_pressed"]
+[connection signal="pressed" from="selectmult" to="." method="_on_selectmult_pressed"]

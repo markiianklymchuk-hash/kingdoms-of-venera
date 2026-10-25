@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://fefgbbfg57pg"]
+
+[ext_resource type="Script" uid="uid://c1o0ivtgnkd7o" path="res://unit.gd" id="1_btf8p"]
+[ext_resource type="Script" uid="uid://dkeu0w41tnaj2" path="res://queur.gd" id="2_ctwoc"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_g7b7a"]
+radius = 16.0
+
+[node name="unit" type="CharacterBody2D" unique_id=1257042426]
+collision_layer = 0
+collision_mask = 7
+script = ExtResource("1_btf8p")
+type = "warrior"
+
+[node name="colider" type="CollisionShape2D" parent="." unique_id=633774514]
+shape = SubResource("CircleShape2D_g7b7a")
+
+[node name="queur" type="Node2D" parent="." unique_id=598717700]
+z_index = 100
+script = ExtResource("2_ctwoc")

@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://ch7cu7uh3cxao"]
+
+[ext_resource type="Script" uid="uid://byxn41dynsmpu" path="res://main_menu.gd" id="1_06t4h"]
+
+[node name="Main menu" type="Control" unique_id=1598214165]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_06t4h")
+
+[node name="tutorial" type="Button" parent="." unique_id=1560904483]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 8.0
+theme_override_font_sizes/font_size = 48
+text = "tutorial"
+
+[connection signal="pressed" from="tutorial" to="." method="_on_tutorial_pressed"]
