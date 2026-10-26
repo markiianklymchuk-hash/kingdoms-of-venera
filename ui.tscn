@@ -13,9 +13,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_fyqef")
-lumber = null
 supplylimit = 2
-player = null
 
 [node name="UI_buttons" type="ColorRect" parent="." unique_id=147199771]
 visible = false
@@ -279,6 +277,16 @@ text = "build farm
 100 lumber, +8 supply"
 autowrap_mode = 2
 
+[node name="build watchtower" type="Button" parent="UI_buttons_build" unique_id=1745817349]
+layout_mode = 0
+offset_left = 140.0
+offset_top = 100.0
+offset_right = 280.0
+offset_bottom = 200.0
+text = "build watchtower
+100 lumber, +8 supply"
+autowrap_mode = 2
+
 [node name="UI_buttons_cancel" type="ColorRect" parent="." unique_id=1480274414]
 visible = false
 layout_mode = 0
@@ -325,5 +333,6 @@ text = "select multiple "
 [connection signal="pressed" from="UI_buttons_build/back" to="." method="_on_back_pressed"]
 [connection signal="pressed" from="UI_buttons_build/build command centre" to="." method="_on_build_command_centre_pressed"]
 [connection signal="pressed" from="UI_buttons_build/build farm" to="." method="_on_build_farm_pressed"]
+[connection signal="pressed" from="UI_buttons_build/build watchtower" to="." method="_on_build_watchtower_pressed"]
 [connection signal="pressed" from="UI_buttons_cancel/cancel" to="." method="_on_cancel_pressed"]
 [connection signal="pressed" from="selectmult" to="." method="_on_selectmult_pressed"]

@@ -11,7 +11,7 @@ var objectives = {
 	"bonus" = ["protect the civilians: ", "build a barracks", "build an army: "],
 	"objectives progress" = [[5,5], true, [0,30, true], true]
 }
-var voicelines = [["Civilian: m'lord! Our enemy wants to kill us all! Please protect us!", true], ["warrior: thanks for rescuing us! we are with you!"], ["scout: enemies incoming!"]]
+var voicelines = [["Civilian: m'lord! Our enemy wants to kill us all! Please protect us!", true], ["warrior: thanks for rescuing us! we are with you!"], ["scout: enemies incoming!"], ["tip: you can press rally, to tell units where to go when they spawn(also allows automatic gathering)"]]
 var tutorial_phase = 0
 var defence_force = {
 	"time" = 0,
@@ -239,6 +239,9 @@ func tutorial():
 		$Camera.position = Vector2(530, 20)
 		if get_tree().get_first_node_in_group("tut1").selected:
 			tutorial_phase = 1
+	elif tutorial_phase > 0:
+		playerUI.available["UI_buttons"]["gather"] = true
+		playerUI.available["UI_buttons"]["return"] = true
 	if tutorial_phase == 1:
 		$Camera.position = Vector2(530, 20)
 		if playerUI.mode == "gather":
@@ -251,6 +254,9 @@ func tutorial():
 		$Camera.position = Vector2(530, 20)
 		if get_tree().get_first_node_in_group("tut2").selected:
 			tutorial_phase = 4
+	elif tutorial_phase > 3:
+		playerUI.available["UI_buttons"]["create worker"] = true
+		playerUI.available["UI_buttons"]["cancel"] = true
 	if tutorial_phase == 4:
 		$Camera.position = Vector2(530, 20)
 		if get_tree().get_first_node_in_group("tut2").mode == "buy":
@@ -258,6 +264,17 @@ func tutorial():
 			return
 	if tutorial_phase == 5:
 		tutorial_phase = 6
+		get_tree().get_first_node_in_group("tut2").selected = false
+		get_tree().get_first_node_in_group("tut2").is_main = false
+		get_tree().get_first_node_in_group("tut2").remove_from_group("selected")
+		playerUI.refresh()
+		await get_tree().process_frame
+		playerUI.command()
+	elif tutorial_phase > 5:
+		playerUI.available["UI_buttons"]["attack"] = true
+		playerUI.available["UI_buttons"]["move"] = true
+		playerUI.available["UI_buttons"]["stop"] = true
+		playerUI.available["UI_buttons"]["defend"] = true
 	if tutorial_phase == 6:
 		$Camera.position = Vector2(80, 530)
 		if !is_instance_valid(get_tree().get_first_node_in_group("tut3")):
@@ -266,10 +283,17 @@ func tutorial():
 		$Camera.position = Vector2(530, 20)
 		if get_tree().get_first_node_in_group("tut4").selected:
 			tutorial_phase = 8
+	elif tutorial_phase > 7:
+		playerUI.available["UI_buttons"]["build"] = true
 	if tutorial_phase == 8:
 		$Camera.position = Vector2(530, 20)
 		if playerUI.build:
 			tutorial_phase = 9
+			await get_tree().process_frame
+			await get_tree().process_frame
+			playerUI.command()
+	elif tutorial_phase > 8:
+		playerUI.available["UI_buttons_build"]["build farm"] = true
 	if tutorial_phase == 9:
 		$Camera.position = Vector2(530, 20)
 		if get_tree().get_first_node_in_group("tut4").mode == "building":
@@ -279,6 +303,14 @@ func tutorial():
 		if voicelines[0][1]:
 			voicelines[0][1] = false
 			playerUI.error(voicelines[0][0], 4)
+		playerUI.available["UI_buttons"]["create warrior"] = true
+		playerUI.available["UI_buttons"]["create archer"] = true
+		playerUI.available["UI_buttons"]["create cavalry"] = true
+		playerUI.available["UI_buttons"]["continue building"] = true
+		playerUI.available["UI_buttons"]["rally"] = true
+		playerUI.available["UI_buttons_build"]["build barracks"] = true
+		playerUI.available["UI_buttons_build"]["build command centre"] = true
+		playerUI.available["UI_buttons_build"]["build watchtower"] = true
 	else:
 		attack_timer = 0
 
@@ -291,6 +323,7 @@ func objectify():
 		for i in get_tree().get_nodes_in_group("1"):
 			if i.type == "barracks":
 				o[1] = false
+				playerUI.error(voicelines[3][0], 3)
 	o[2][0] = playerUI.currentsupply
 	if o[0][0] == 0 and !o[1] and !o[2][2]:
 		o[3] = false
@@ -314,6 +347,9 @@ func _on_skip_pressed() -> void:
 	tutorial_phase = 10
 	$mission/mission/skip.visible = false
 	$mission/mission/tuttext.visible = false
+	await get_tree().process_frame
+	await get_tree().process_frame
+	playerUI.command()
 
 
 func _on_reinforcements_body_entered(body: CharacterBody2D) -> void:

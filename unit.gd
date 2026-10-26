@@ -74,7 +74,7 @@ func _process(delta: float) -> void:
 		die()
 	if !building:
 		move_and_slide()
-	if carrying.size() >= 1:
+	if carrying.size() >= 1 and mode == "return":
 		set_collision_mask_value(1, false)
 		set_collision_layer_value(1, false)
 	else:
@@ -178,7 +178,7 @@ func search_for_resourse():
 			if he.global_position.distance_to(global_position) <= main.unit[type]["search"] and he.gatherers < 2:
 				best = he
 		else:
-			if (global_position.distance_to(best.global_position) > global_position.distance_to(he.global_position) and he.global_position.distance_to(global_position) <= main.unit[type]["search"] and he.gatherers <2 and wastarget != he) or wastarget == he:
+			if (global_position.distance_to(best.global_position) > global_position.distance_to(he.global_position) and he.global_position.distance_to(global_position) <= main.unit[type]["search"] and he.gatherers <2 and wastarget != he) or is_instance_valid(wastarget) and wastarget is Node2D and wastarget == he:
 				best = he
 	if best != null:
 		target = best
@@ -187,7 +187,7 @@ func search_for_resourse():
 		mode = "idle"
 	
 func damage():
-	var full_damage = max(main.unit[type]["damage"] * main.damage_matrix[target.main.unit[type]["armor type"]][main.unit[type]["damage type"]] - target.main.unit[target.type]["armor"], 0)
+	var full_damage = max(main.unit[type]["damage"] * main.damage_matrix[target.main.unit[target.type]["armor type"]][main.unit[type]["damage type"]] - target.main.unit[target.type]["armor"], 0) 
 	target.hp -= full_damage
 	if target.hp <= 0:
 		target = null

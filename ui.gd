@@ -9,7 +9,7 @@ var unit = {
 		"speed" = 2200,
 		"damage" = 10,
 		"damage type" = "hack",
-		"armor" = 4,
+		"armor" = 3,
 		"armor type" = "medium",
 		"range" = 15,
 		"cooldown" = 1.0,
@@ -36,15 +36,17 @@ var unit = {
 		"command centre time" = 60,
 		"farm lumber" = 100,
 		"farm time" = 20,
+		"watchtower lumber" = 125,
+		"watchtower time" = 25,
 		"commands" = ["move", "attack", "stop", "defend", "gather", "return", "build", "continue building"],
-		"build commands" = ["build barracks", "build command centre", "build farm", "back"],
+		"build commands" = ["build barracks", "build command centre", "build farm", "back", "build watchtower"],
 	},
 	"archer" = {
 		"size" = 12,
 		"aggro" = 400,
 		"supply" = -2,
 		"health" = 80,
-		"speed" = 20,
+		"speed" = 2400,
 		"damage" = 10,
 		"damage type" = "piercing",
 		"armor" = 0,
@@ -137,6 +139,22 @@ var unit = {
 		"commands" = [],
 		"cancel commands" = ["cancel"],
 	}, 
+	"watchtower" = {
+		"size" = 32,
+		"aggro" = 300,
+		"supply" = 0,
+		"health" = 300,
+		"speed" = 0,
+		"damage" = 14,
+		"damage type" = "piercing",
+		"armor" = 3,
+		"armor type" = "building",
+		"range" = 240,
+		"cooldown" = 2,
+		"watchtower time" = 25,
+		"commands" = ["attack", "stop"],
+		"cancel commands" = ["cancel"],
+	}, 
 }
 var damage_matrix = {
 	"unarmoured" = {
@@ -155,8 +173,8 @@ var damage_matrix = {
 		"cut" = 0.5,
 	},
 	"building" = {
-		"hack" = 0.25,
-		"piercing" = 0.5,
+		"hack" = 0.75,
+		"piercing" = 0.25,
 		"cut" = 0,
 	},
 }
@@ -186,7 +204,36 @@ var oneunit = false
 @export var player = "1"
 var active = true
 var what = null
-
+@export var available = {
+	"UI_buttons" = {
+		"move" = true,
+		"build" = true,
+		"create warrior" = true,
+		"create worker" = true,
+		"create archer" = true,
+		"create cavalry" = true,
+		"cancel" = true,
+		"continue building" = true,
+		"attack" = true,
+		"gather" = true,
+		"return" = true,
+		"stop" = true,
+		"defend" = true,
+		"rally" = true,
+		"dropoff point" = true,
+		"create" = true,
+	},
+	"UI_buttons_build" = {
+		"build barracks" = true,
+		"back" = true,
+		"build command centre" = true,
+		"build farm" = true,
+		"build watchtower" = true,
+	},
+	"UI_buttons_cancel" = {
+		"cancel" = true,
+	}
+}
 func _ready() -> void:
 	if get_parent().get_parent().type != player:
 		active = false
@@ -310,6 +357,10 @@ func command():
 				get_node("UI_buttons/" + i).visible = true
 				if i.contains("create "):
 					get_node("UI_buttons/" + i).text =  i + " \n" + str(first.main.unit[first.type][i.substr(7) + " lumber"]) +" lumber, " + str(first.main.unit[i.substr(7)]["supply"]) + " supply"
+		for u in available.keys():
+			for i in available[u].keys():
+				if !available[u][i]:
+					get_node(u + "/" + i).visible = false
 	else:
 		$UI_buttons.visible = false
 		$UI_buttons_build.visible = false
@@ -456,6 +507,8 @@ func check(world_pos: Vector2, sizes: float) -> bool:
 	params.collide_with_areas = false
 
 	var hits := get_world_2d().direct_space_state.intersect_shape(params, 1)
+	if !hits.is_empty():
+		error("can't place here", 1)
 	return hits.is_empty()
 
 func select(event):
@@ -509,6 +562,7 @@ func learn():
 	draww["barracks"] = [[Vector2(pos[0] - 5, pos[1]), Vector2(pos[0], pos[1] - 5), Vector2(pos[0] + 5, pos[1])], Color("ebdcd3ff")]
 	draww["command centre"] = [[Vector2(pos[0] - 5, pos[1]), Vector2(pos[0], pos[1] - 5), Vector2(pos[0] + 5, pos[1])], Color("ebdcd3ff")]
 	draww["farm"] = [[Vector2(pos[0] - 5, pos[1]), Vector2(pos[0], pos[1] - 5), Vector2(pos[0] + 5, pos[1])], Color("ebdcd3ff")]
+	draww["watchtower"] = [[Vector2(pos[0] - 5, pos[1]), Vector2(pos[0], pos[1] - 5), Vector2(pos[0] + 5, pos[1])], Color("ebdcd3ff")]
 	draww["civilian"] = [[Vector2(pos[0] - 5, pos[1]), Vector2(pos[0], pos[1] - 5), Vector2(pos[0] + 5, pos[1])], Color("ebdcd3ff")]
 	draww["worker"] = [[Vector2(pos[0] - 10, pos[1] + 10), Vector2(pos[0] + 5, pos[1] - 5), Vector2(pos[0], pos[1] - 7.5), Vector2(pos[0] + 10, pos[1] - 7.5), Vector2(pos[0] + 10, pos[1]), Vector2(pos[0] +5, pos[1] - 2.5), Vector2(pos[0] - 7.5, pos[1] + 10)], Color("b3a29dff")]
 	draww["cavalry"] = [[Vector2(pos[0] - 10, pos[1] + 10), Vector2(pos[0] - 10, pos[1]), Vector2(pos[0], pos[1] - 5), Vector2(pos[0] + 9, pos[1] - 5), Vector2(pos[0] + 9, pos[1] - 3), Vector2(pos[0] + 4, pos[1] - 3), Vector2(pos[0] +4, pos[1] + 10), Vector2(pos[0] + 1, pos[1] + 10), Vector2(pos[0] +1, pos[1] + 3), Vector2(pos[0] -7, pos[1] + 3), Vector2(pos[0] -7, pos[1] + 10)], Color("ebdcd3ff")]
@@ -695,3 +749,10 @@ func _on_rally_pressed() -> void:
 	selecting = true
 	mode = "rally"
 	oneunit= false
+
+
+func _on_build_watchtower_pressed() -> void:
+	selecting = true
+	mode = "building"
+	what = "watchtower"
+	oneunit= true
