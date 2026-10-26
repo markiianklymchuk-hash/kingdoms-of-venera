@@ -17,10 +17,11 @@ var text = {
 func _ready():
 	camera = get_parent().get_parent().get_node("Camera")
 func _draw():
+	var C = get_parent().get_parent().get_node("C")
 	$tuttext.text = text[str(get_parent().get_parent().tutorial_phase)]
 	if get_parent().get_parent().tutorial_phase == 0:
-		draw_circle(get_tree().get_first_node_in_group("tut1").global_position - camera.global_position + Vector2(576, 324), get_tree().get_first_node_in_group("tut1").unit[get_tree().get_first_node_in_group("tut1").type]["size"] * 3/2, Color("ffff00ff"), false, 2)
+		draw_circle(get_tree().get_first_node_in_group("tut1").global_position - camera.global_position + Vector2(576, 324), C.get_node("1").unit[get_tree().get_first_node_in_group("tut1").type]["size"] * 3/2, Color("ffff00ff"), false, 2)
 	if get_parent().get_parent().tutorial_phase == 3:
-		draw_circle(get_tree().get_first_node_in_group("tut2").global_position - camera.global_position + Vector2(576, 324), get_tree().get_first_node_in_group("tut2").unit[get_tree().get_first_node_in_group("tut2").type]["size"] * 3/2, Color("ffff00ff"), false, 4)
+		draw_circle(get_tree().get_first_node_in_group("tut2").global_position - camera.global_position + Vector2(576, 324), C.get_node("1").unit[get_tree().get_first_node_in_group("tut2").type]["size"] * 3/2, Color("ffff00ff"), false, 4)
 	if get_parent().get_parent().tutorial_phase == 7:
-		draw_circle(get_tree().get_first_node_in_group("tut4").global_position - camera.global_position + Vector2(576, 324), get_tree().get_first_node_in_group("tut4").unit[get_tree().get_first_node_in_group("tut4").type]["size"] * 3/2, Color("ffff00ff"), false, 2)
+		draw_circle(get_tree().get_first_node_in_group("tut4").global_position - camera.global_position + Vector2(576, 324), C.get_node("1").unit[get_tree().get_first_node_in_group("tut4").type]["size"] * 3/2, Color("ffff00ff"), false, 2)

@@ -13,9 +13,12 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_fyqef")
+lumber = null
 supplylimit = 2
+player = null
 
 [node name="UI_buttons" type="ColorRect" parent="." unique_id=147199771]
+visible = false
 z_index = -1
 layout_mode = 0
 offset_left = 592.0
@@ -234,7 +237,6 @@ theme_override_font_sizes/font_size = 32
 autowrap_mode = 2
 
 [node name="UI_buttons_build" type="ColorRect" parent="." unique_id=358292207]
-visible = false
 layout_mode = 0
 offset_left = 592.0
 offset_top = 448.0

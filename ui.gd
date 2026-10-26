@@ -1,5 +1,165 @@
 extends Control
 
+var unit = {
+	"warrior" = {
+		"size" = 16,
+		"aggro" = 300,
+		"supply" = -2,
+		"health" = 110,
+		"speed" = 2200,
+		"damage" = 10,
+		"damage type" = "hack",
+		"armor" = 4,
+		"armor type" = "medium",
+		"range" = 15,
+		"cooldown" = 1.0,
+		"commands" = ["move", "attack", "stop", "defend"],
+	},
+	"worker" = {
+		"size" = 10,
+		"aggro" = 300,
+		"supply" = -1,
+		"health" = 60,
+		"speed" = 2600,
+		"damage" = 5,
+		"damage type" = "hack",
+		"armor" = 0,
+		"armor type" = "unarmoured",
+		"range" = 15,
+		"cooldown" = 2.0,
+		"gather" = 5,
+		"how much" = 10,
+		"search" = 300,
+		"barracks lumber" = 150,
+		"barracks time" = 45,
+		"command centre lumber" = 375,
+		"command centre time" = 60,
+		"farm lumber" = 100,
+		"farm time" = 20,
+		"commands" = ["move", "attack", "stop", "defend", "gather", "return", "build", "continue building"],
+		"build commands" = ["build barracks", "build command centre", "build farm", "back"],
+	},
+	"archer" = {
+		"size" = 12,
+		"aggro" = 400,
+		"supply" = -2,
+		"health" = 80,
+		"speed" = 20,
+		"damage" = 10,
+		"damage type" = "piercing",
+		"armor" = 0,
+		"armor type" = "unarmoured",
+		"range" = 200,
+		"cooldown" = 3.0,
+		"commands" = ["move", "attack", "stop", "defend"],
+	},
+	"cavalry" = {
+		"size" = 20,
+		"aggro" = 400,
+		"supply" = -3,
+		"health" = 120,
+		"speed" = 5200,
+		"damage" = 5,
+		"damage type" = "cut",
+		"armor" = 2,
+		"armor type" = "light",
+		"range" = 10,
+		"cooldown" = 0.3,
+		"commands" = ["move", "attack", "stop", "defend"],
+	}, 
+	"civilian" = {
+		"size" = 8,
+		"aggro" = 0,
+		"supply" = -1,
+		"health" = 40,
+		"speed" = 2400,
+		"damage" = 0,
+		"damage type" = "unarmed",
+		"armor" = 0,
+		"armor type" = "unarmoured",
+		"range" = 200,
+		"cooldown" = -1,
+		"commands" = ["move", "stop", "defend"],
+	},
+	"barracks" = {
+		"size" = 68,
+		"aggro" = 0,
+		"supply" = 0,
+		"health" = 1400,
+		"speed" = 0,
+		"damage" = 0,
+		"damage type" = "unarmed",
+		"armor" = 5,
+		"armor type" = "building",
+		"range" = 400,
+		"cooldown" = -1,
+		"barracks time" = 45,
+		"warrior lumber" = 60,
+		"warrior time" = 8,
+		"archer lumber" = 60,
+		"archer time" = 14,
+		"cavalry lumber" = 85,
+		"cavalry time" = 22,
+		"commands" = ["create warrior", "create cavalry", "create archer", "cancel", "create", "rally"],
+		"cancel commands" = ["cancel"],
+	}, 
+	"command centre" = {
+		"size" = 80,
+		"aggro" = 0,
+		"supply" = 10,
+		"health" = 2000,
+		"speed" = 0,
+		"damage" = 0,
+		"damage type" = "unarmed",
+		"armor" = 5,
+		"armor type" = "building",
+		"range" = 400,
+		"cooldown" = -1,
+		"command centre time" = 60,
+		"worker lumber" = 25,
+		"worker time" = 10,
+		"commands" = ["create worker", "cancel", "dropoff point",  "create", "rally"],
+		"cancel commands" = ["cancel"],
+	}, 
+	"farm" = {
+		"size" = 36,
+		"aggro" = 0,
+		"supply" = 8,
+		"health" = 800,
+		"speed" = 0,
+		"damage" = 0,
+		"damage type" = "unarmed",
+		"armor" = 3,
+		"armor type" = "building",
+		"range" = 400,
+		"cooldown" = -1,
+		"farm time" = 20,
+		"commands" = [],
+		"cancel commands" = ["cancel"],
+	}, 
+}
+var damage_matrix = {
+	"unarmoured" = {
+		"hack" = 0.75,
+		"piercing" = 0.5,
+		"cut" = 1,
+	},
+	"light" = {
+		"hack" = 1,
+		"piercing" = 0.75,
+		"cut" = 0.75,
+	},
+	"medium" = {
+		"hack" = 0.75,
+		"piercing" = 1,
+		"cut" = 0.5,
+	},
+	"building" = {
+		"hack" = 0.25,
+		"piercing" = 0.5,
+		"cut" = 0,
+	},
+}
 @export var lumber = 0
 var currentsupply = 0
 var supply = 0
@@ -26,7 +186,7 @@ var oneunit = false
 @export var player = "1"
 var active = true
 var what = null
-# Called when the node enters the scene tree for the first time.
+
 func _ready() -> void:
 	if get_parent().get_parent().type != player:
 		active = false
@@ -84,12 +244,16 @@ func _process(_delta: float) -> void:
 			$UI_text/unit.text = "unit: " + first.type 
 			$UI_text/hp.text = "health: " + str(int(first.hp))
 			$UI_text/next.visible = false
+		else:
+			refresh()
 		
 	else:
 		first = selectedall[0]
 		if is_instance_valid(first):
 			$UI_text/unit.text = "unit: " + first.type + " and " + str(selectedall.size() - 1) + " more"
 			$UI_text/hp.text = "health: " + str(int(first.hp))
+		else:
+			refresh()
 
 func refresh():
 	selectedall = get_tree().get_nodes_in_group("selected")
@@ -106,10 +270,10 @@ func find_supply():
 	supply = 0
 	currentsupply = 0
 	for i in get_tree().get_nodes_in_group(player):
-		if i.unit[i.type]["supply"] > 0 and i.alive:
-			supply += i.unit[i.type]["supply"]
+		if unit[i.type]["supply"] > 0 and i.alive:
+			supply += unit[i.type]["supply"]
 		elif i.alive:
-			currentsupply -= i.unit[i.type]["supply"]
+			currentsupply -= unit[i.type]["supply"]
 	if supply >= supplylimit:
 		supply = supplylimit
 
@@ -124,15 +288,17 @@ func command():
 				i.visible = false
 			if str(first.side) != player:
 				return
-			for i in first.unit[first.type]["build commands"]:
+			for i in first.main.unit[first.type]["build commands"]:
 				get_node("UI_buttons_build/" + i).visible = true
+				if i.contains("build "):
+					get_node("UI_buttons_build/" + i).text =  i + " \n" + str(first.main.unit[first.type][i.substr(6) + " lumber"]) +" lumber, +" + str(first.main.unit[i.substr(6)]["supply"]) + " supply"
 		elif !first.alive:
 			$UI_buttons_cancel.visible = true
 			for i in $UI_buttons_cancel.get_children():
 				i.visible = false
 			if str(first.side) != player:
 				return
-			for i in first.unit[first.type]["cancel commands"]:
+			for i in first.main.unit[first.type]["cancel commands"]:
 				get_node("UI_buttons_cancel/" + i).visible = true
 		else:
 			$UI_buttons.visible = true
@@ -140,8 +306,10 @@ func command():
 				i.visible = false
 			if str(first.side) != player:
 				return
-			for i in first.unit[first.type]["commands"]:
+			for i in first.main.unit[first.type]["commands"]:
 				get_node("UI_buttons/" + i).visible = true
+				if i.contains("create "):
+					get_node("UI_buttons/" + i).text =  i + " \n" + str(first.main.unit[first.type][i.substr(7) + " lumber"]) +" lumber, " + str(first.main.unit[i.substr(7)]["supply"]) + " supply"
 	else:
 		$UI_buttons.visible = false
 		$UI_buttons_build.visible = false
@@ -181,7 +349,7 @@ func stopbox():
 			u.selected = false
 			u.is_main = false
 		for u in get_tree().get_nodes_in_group(player):
-			var r = u.unit[u.type]["size"]
+			var r = unit[u.type]["size"]
 			if box.grow(r).has_point(u.global_position):
 				u.selected = true
 	pointa = null
@@ -213,7 +381,7 @@ func do(event):
 	elif mode == "build":
 		for i in range(get_tree().get_node_count_in_group("unit")):
 			var units = get_tree().get_nodes_in_group("unit")
-			var ranger = units[i].unit[units[i].type]["size"]
+			var ranger = units[i].main.unit[units[i].type]["size"]
 			if best == null and world_pos.distance_to(units[i].global_position) <= ranger and units[i].building and !units[i].alive:
 				best = units[i]
 			elif best != null and units[i].building and !units[i].alive:
@@ -225,7 +393,7 @@ func do(event):
 			units.append_array(get_tree().get_nodes_in_group("tree"))
 			var ranger
 			if units[i].is_in_group("unit"):
-				ranger = units[i].unit[units[i].type]["size"] + 4
+				ranger = units[i].main.unit[units[i].type]["size"] + 4
 			else:
 				ranger = 40
 			if best == null and world_pos.distance_to(units[i].global_position) <= ranger:
@@ -236,7 +404,7 @@ func do(event):
 	else:
 		for i in range(get_tree().get_node_count_in_group("unit")):
 			var units = get_tree().get_nodes_in_group("unit")
-			var ranger = units[i].unit[units[i].type]["size"] + 4
+			var ranger = units[i].main.unit[units[i].type]["size"] + 4
 			if best == null and world_pos.distance_to(units[i].global_position) <= ranger:
 				best = units[i]
 			elif best != null:
@@ -247,14 +415,14 @@ func do(event):
 	if oneunit:
 		var u = first
 		if mode == "building":
-			if check(world_pos, Vector2(first.unit[what]["size"], first.unit[what]["size"])):
+			if check(world_pos, first.main.unit[what]["size"]):
 				u.target = world_pos
 				u.mode = mode
 				u.what = what
 	else:
 		for u in get_tree().get_nodes_in_group("selected"):
 			var actualmode = modify()
-			if u.is_in_group(player) and u.unit[u.type]["commands"].has(actualmode):
+			if u.is_in_group(player) and unit[u.type]["commands"].has(actualmode):
 				if mode == "attack":
 					u.is_atacking_from_order = true
 				else:
@@ -276,9 +444,9 @@ func do(event):
 	what = null
 	build = false
 
-func check(world_pos: Vector2, sizes: Vector2) -> bool:
-	var shape := RectangleShape2D.new()
-	shape.size = sizes
+func check(world_pos: Vector2, sizes: float) -> bool:
+	var shape := CircleShape2D.new()
+	shape.radius = sizes
 
 	var params := PhysicsShapeQueryParameters2D.new()
 	params.shape = shape
@@ -295,7 +463,7 @@ func select(event):
 	var best = null
 	for i in range(get_tree().get_node_count_in_group("unit")):
 		var units = get_tree().get_nodes_in_group("unit")
-		var ranger = units[i].unit[units[i].type]["size"] + 4
+		var ranger = units[i].main.unit[units[i].type]["size"] + 4
 		units[i].selected = false
 		units[i].is_main = false
 		if best == null and world_pos.distance_to(units[i].global_position) <= ranger:
@@ -360,7 +528,7 @@ func _on_stop_pressed() -> void:
 func do_but_cooler():
 	for u in get_tree().get_nodes_in_group("selected"):
 		var actualmode = modify()
-		if u.is_in_group(player) and u.unit[u.type]["commands"].has(actualmode) or u.unit[u.type].has("cancel commands") and u.unit[u.type]["cancel commands"].has(actualmode):
+		if u.is_in_group(player) and unit[u.type]["commands"].has(actualmode) or unit[u.type].has("cancel commands") and unit[u.type]["cancel commands"].has(actualmode):
 			u.mode = mode
 			u.target = null
 			u.is_atacking_from_order = false
@@ -396,7 +564,7 @@ func _draw():
 		pos = Vector2(425, 475)
 		learn()
 		draw_line(pos + Vector2(25, 0), pos + Vector2(75,0), Color("000000ff"), 2)
-		draw_line(pos + Vector2(25, 0), pos + Vector2(25 + 50 * first.progress / first.unit[first.type][first.queue[0] + " time"],0), Color("ffff00ff"), 2)
+		draw_line(pos + Vector2(25, 0), pos + Vector2(25 + 50 * first.progress / first.main.unit[first.type][first.queue[0] + " time"],0), Color("ffff00ff"), 2)
 		draw_colored_polygon(draww[first.queue[0]][0],draww[first.queue[0]][1])
 	if first.queue.size() > 1:
 		pos = Vector2(475, 525)
@@ -417,9 +585,9 @@ func _draw():
 	
 
 func _on_next_pressed() -> void:
-	var unit = selectedall[0]
-	selectedall.erase(unit)
-	selectedall.append(unit)
+	var unitk = selectedall[0]
+	selectedall.erase(unitk)
+	selectedall.append(unitk)
 	for i in selectedall:
 		i.is_main = false
 	if selectedall.size() != 0:

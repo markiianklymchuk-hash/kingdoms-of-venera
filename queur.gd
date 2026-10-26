@@ -18,8 +18,8 @@ func _process(_delta: float) -> void:
 
 func _draw():
 	hp = get_parent().hp
-	maxhp = get_parent().unit[get_parent().type]["health"]
-	size = get_parent().unit[get_parent().type]["size"]
+	maxhp = get_parent().main.unit[get_parent().type]["health"]
+	size = get_parent().main.unit[get_parent().type]["size"]
 	target = get_parent().target
 	wastarget = get_parent().wastarget
 	currently_attacking = get_parent().currently_attacking
@@ -46,7 +46,7 @@ func _draw():
 		if get_parent().progress > 0:
 			draw_line(Vector2.ZERO, wastarget.global_position - get_parent().position, Color("642c04ff"), 2.0)
 	if mode == "building" and selected:
-		draw_circle(wastarget - get_parent().position, get_parent().unit[what]["size"], Color("8a7b6bff"), false, 4)
+		draw_circle(wastarget - get_parent().position, get_parent().main.unit[what]["size"], Color("8a7b6bff"), false, 4)
 	if mode == "build" and is_instance_valid(wastarget):
 		if selected:
 			draw_circle(wastarget.global_position - get_parent().position, 4, Color("14483bff"), false, 2)

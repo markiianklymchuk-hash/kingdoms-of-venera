@@ -321,4 +321,5 @@ func _on_reinforcements_body_entered(body: CharacterBody2D) -> void:
 		$reinforcements.queue_free()
 		for i in get_tree().get_nodes_in_group("reinforced"):
 			i.side = 1
+			i._ready()
 		playerUI.error(voicelines[1][0], 2)
