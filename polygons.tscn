@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://7slwxdffkk7e"]
+
+[node name="Polygons" type="Node2D" unique_id=1152368565]
+
+[node name="warrior" type="Polygon2D" parent="." unique_id=1364210304]
+visible = false
+color = Color(0.7294118, 0.6901961, 0.07058824, 1)
+polygon = PackedVector2Array(-10, -10, 10, -10, 10, 10, 0, 20, -10, 10)
+
+[node name="worker" type="Polygon2D" parent="." unique_id=1397623110]
+visible = false
+color = Color(0.45882386, 0.45882386, 0.45882386, 1)
+polygon = PackedVector2Array(-11, 7, 3, -5, 0, -7.5, 10, -7.5, 9, 1, 6, -2, -7.5, 10)
+
+[node name="the paladin" type="Polygon2D" parent="." unique_id=334228633]
+visible = false
+color = Color(0.45882386, 0.45882386, 0.45882386, 1)
+polygon = PackedVector2Array(-11, 7, 3, -5, -6, -13, 0, -17, 19, 1, 15, 7, 6, -2, -7.5, 10)
+
+[node name="civilian" type="Polygon2D" parent="." unique_id=459857266]
+visible = false
+polygon = PackedVector2Array(-5, -2.5, 0, 2.5, 5, -2.5)
+
+[node name="watchtower" type="Polygon2D" parent="." unique_id=335340411]
+visible = false
+color = Color(0.85821396, 0.85821384, 0.85821384, 1)
+polygon = PackedVector2Array(-12, 0, -7, -7, 0, -9, 7, -7, 12, 0, 7, 7, 0, 9, -7, 7)
+
+[node name="barracks" type="Polygon2D" parent="." unique_id=1747641025]
+visible = false
+color = Color(0.27131358, 0.27131358, 0.27131355, 1)
+polygon = PackedVector2Array(-10, -10, 10, -10, 10, 10, 0, 20, -10, 10)
+
+[node name="command centre" type="Polygon2D" parent="." unique_id=845221561]
+visible = false
+color = Color(1, 0.54509807, 0.57254905, 1)
+polygon = PackedVector2Array(-3, -15, 11, -15, 11, -4, 3, -4, 3, 5, 9, 16, -9, 16, -3, 5)
+
+[node name="farm" type="Polygon2D" parent="." unique_id=749075159]
+visible = false
+color = Color(1, 1, 0, 1)
+polygon = PackedVector2Array(-6, -8, -6, 8, 6, 8, 6, -8)
+
+[node name="archer" type="Polygon2D" parent="." unique_id=1129378263]
+visible = false
+color = Color(0.36928418, 0.19599378, 0.10940575, 1)
+polygon = PackedVector2Array(-10, 15, -5, 0, 0, -5, 15, -10)
+
+[node name="cavalry" type="Polygon2D" parent="." unique_id=277484036]
+visible = false
+polygon = PackedVector2Array(-10, 10, -10, 0, 0, -5, 9, -5, 9, -3, 4, -3, 4, 10, 1, 10, 1, 4, -7, 4, -7, 10)

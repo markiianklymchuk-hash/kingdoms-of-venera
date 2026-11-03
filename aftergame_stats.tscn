@@ -1,0 +1,137 @@
+[gd_scene format=3 uid="uid://0kl8ohi3grsn"]
+
+[ext_resource type="Script" uid="uid://dhesu1ivua26m" path="res://aftergame_stats.gd" id="1_wier4"]
+
+[node name="aftergame stats" type="Control" unique_id=1423203062]
+process_mode = 3
+z_index = 200
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1152.0
+offset_bottom = 657.0
+script = ExtResource("1_wier4")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=597808035]
+layout_mode = 0
+offset_left = 288.0
+offset_right = 864.0
+offset_bottom = 648.0
+color = Color(0.51111823, 0.51111823, 0.51111823, 1)
+
+[node name="ColorRect2" type="ColorRect" parent="." unique_id=135257515]
+layout_mode = 0
+offset_left = 864.0
+offset_right = 1152.0
+offset_bottom = 324.0
+color = Color(0.51111823, 0.51111823, 0.51111823, 1)
+
+[node name="main menu" type="Button" parent="." unique_id=838513003]
+layout_mode = 0
+offset_left = 376.0
+offset_top = 524.0
+offset_right = 776.0
+offset_bottom = 624.0
+text = "quit to main menu"
+
+[node name="next" type="Button" parent="." unique_id=923369779]
+layout_mode = 0
+offset_left = 776.0
+offset_top = 16.0
+offset_right = 856.0
+offset_bottom = 76.0
+theme_override_font_sizes/font_size = 32
+text = "next"
+
+[node name="faction" type="Label" parent="." unique_id=1918593421]
+layout_mode = 0
+offset_left = 376.0
+offset_top = 8.0
+offset_right = 776.0
+offset_bottom = 78.0
+theme_override_font_sizes/font_size = 48
+text = "medieval(player)"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="victorycon" type="Label" parent="." unique_id=955517058]
+layout_mode = 0
+offset_left = 376.0
+offset_top = 456.0
+offset_right = 776.0
+offset_bottom = 526.0
+theme_override_font_sizes/font_size = 48
+text = "medieval(player)"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="resources gathered" type="Label" parent="." unique_id=965737996]
+layout_mode = 0
+offset_left = 346.0
+offset_top = 100.0
+offset_right = 446.0
+offset_bottom = 130.0
+
+[node name="resources spent" type="Label" parent="." unique_id=1276858742]
+layout_mode = 0
+offset_left = 346.0
+offset_top = 130.0
+offset_right = 446.0
+offset_bottom = 160.0
+
+[node name="units lost(in value)" type="Label" parent="." unique_id=1744366611]
+layout_mode = 0
+offset_left = 346.0
+offset_top = 160.0
+offset_right = 446.0
+offset_bottom = 190.0
+
+[node name="units killed(in value)" type="Label" parent="." unique_id=1081877314]
+layout_mode = 0
+offset_left = 346.0
+offset_top = 190.0
+offset_right = 446.0
+offset_bottom = 220.0
+
+[node name="units produced" type="Label" parent="." unique_id=386200687]
+layout_mode = 0
+offset_left = 346.0
+offset_top = 220.0
+offset_right = 446.0
+offset_bottom = 250.0
+
+[node name="units lost" type="Label" parent="." unique_id=2103164950]
+layout_mode = 0
+offset_left = 346.0
+offset_top = 250.0
+offset_right = 446.0
+offset_bottom = 280.0
+
+[node name="units killed" type="Label" parent="." unique_id=129687891]
+layout_mode = 0
+offset_left = 346.0
+offset_top = 280.0
+offset_right = 446.0
+offset_bottom = 310.0
+
+[node name="workers produced" type="Label" parent="." unique_id=730359460]
+layout_mode = 0
+offset_left = 346.0
+offset_top = 310.0
+offset_right = 446.0
+offset_bottom = 340.0
+
+[node name="buildings produced" type="Label" parent="." unique_id=699927209]
+layout_mode = 0
+offset_left = 346.0
+offset_top = 340.0
+offset_right = 446.0
+offset_bottom = 370.0
+
+[node name="objectives" type="Label" parent="." unique_id=1625081282]
+layout_mode = 0
+offset_left = 864.0
+offset_right = 1152.0
+offset_bottom = 324.0
+
+[connection signal="pressed" from="main menu" to="." method="_on_main_menu_pressed"]
+[connection signal="pressed" from="next" to="." method="_on_next_pressed"]

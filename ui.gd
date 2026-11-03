@@ -5,11 +5,11 @@ var unit = {
 		"size" = 16,
 		"aggro" = 300,
 		"supply" = -2,
+		"value" = 60,
 		"health" = 110,
-		"speed" = 2200,
+		"speed" = 35,
 		"damage" = 10,
 		"damage type" = "hack",
-		"armor" = 3,
 		"armor type" = "medium",
 		"range" = 15,
 		"cooldown" = 1.0,
@@ -19,11 +19,11 @@ var unit = {
 		"size" = 10,
 		"aggro" = 300,
 		"supply" = -1,
+		"value" = 25,
 		"health" = 60,
-		"speed" = 2600,
+		"speed" = 45,
 		"damage" = 5,
 		"damage type" = "hack",
-		"armor" = 0,
 		"armor type" = "unarmoured",
 		"range" = 15,
 		"cooldown" = 2.0,
@@ -38,18 +38,18 @@ var unit = {
 		"farm time" = 20,
 		"watchtower lumber" = 125,
 		"watchtower time" = 25,
-		"commands" = ["move", "attack", "stop", "defend", "gather", "return", "build", "continue building"],
+		"commands" = ["move", "attack", "stop", "defend", "gather", "return", "build", "continue building", "worker"],
 		"build commands" = ["build barracks", "build command centre", "build farm", "back", "build watchtower"],
 	},
 	"archer" = {
 		"size" = 12,
 		"aggro" = 400,
 		"supply" = -2,
+		"value" = 60,
 		"health" = 80,
-		"speed" = 2400,
+		"speed" = 40,
 		"damage" = 10,
 		"damage type" = "piercing",
-		"armor" = 0,
 		"armor type" = "unarmoured",
 		"range" = 200,
 		"cooldown" = 3.0,
@@ -59,11 +59,11 @@ var unit = {
 		"size" = 20,
 		"aggro" = 400,
 		"supply" = -3,
+		"value" = 85,
 		"health" = 120,
-		"speed" = 5200,
+		"speed" = 80,
 		"damage" = 5,
 		"damage type" = "cut",
-		"armor" = 2,
 		"armor type" = "light",
 		"range" = 10,
 		"cooldown" = 0.3,
@@ -73,11 +73,11 @@ var unit = {
 		"size" = 8,
 		"aggro" = 0,
 		"supply" = -1,
+		"value" = 0,
 		"health" = 40,
-		"speed" = 2400,
+		"speed" = 40,
 		"damage" = 0,
 		"damage type" = "unarmed",
-		"armor" = 0,
 		"armor type" = "unarmoured",
 		"range" = 200,
 		"cooldown" = -1,
@@ -87,11 +87,11 @@ var unit = {
 		"size" = 68,
 		"aggro" = 0,
 		"supply" = 0,
+		"value" = 150,
 		"health" = 1400,
 		"speed" = 0,
 		"damage" = 0,
 		"damage type" = "unarmed",
-		"armor" = 5,
 		"armor type" = "building",
 		"range" = 400,
 		"cooldown" = -1,
@@ -109,11 +109,11 @@ var unit = {
 		"size" = 80,
 		"aggro" = 0,
 		"supply" = 10,
+		"value" = 375,
 		"health" = 2000,
 		"speed" = 0,
 		"damage" = 0,
 		"damage type" = "unarmed",
-		"armor" = 5,
 		"armor type" = "building",
 		"range" = 400,
 		"cooldown" = -1,
@@ -127,11 +127,11 @@ var unit = {
 		"size" = 36,
 		"aggro" = 0,
 		"supply" = 8,
+		"value" = 100,
 		"health" = 800,
 		"speed" = 0,
 		"damage" = 0,
 		"damage type" = "unarmed",
-		"armor" = 3,
 		"armor type" = "building",
 		"range" = 400,
 		"cooldown" = -1,
@@ -143,17 +143,32 @@ var unit = {
 		"size" = 32,
 		"aggro" = 300,
 		"supply" = 0,
+		"value" = 125,
 		"health" = 300,
 		"speed" = 0,
 		"damage" = 14,
 		"damage type" = "piercing",
-		"armor" = 3,
 		"armor type" = "building",
 		"range" = 240,
-		"cooldown" = 2,
+		"cooldown" = 2.0,
 		"watchtower time" = 25,
 		"commands" = ["attack", "stop"],
 		"cancel commands" = ["cancel"],
+	}, 
+	"the paladin" = {
+		"size" = 20,
+		"aggro" = 300,
+		"supply" = -2,
+		"value" = 500,
+		"health" = 200,
+		"speed" = 40,
+		"regenerate" = ["regenerate", 2],
+		"damage" = 14,
+		"damage type" = "blunt",
+		"armor type" = "heavy",
+		"range" = 20,
+		"cooldown" = 3.0,
+		"commands" = ["move", "attack", "stop", "defend", "regenerate"],
 	}, 
 }
 var damage_matrix = {
@@ -161,21 +176,31 @@ var damage_matrix = {
 		"hack" = 0.75,
 		"piercing" = 0.5,
 		"cut" = 1,
+		"blunt" = 0.5,
 	},
 	"light" = {
 		"hack" = 1,
 		"piercing" = 0.75,
 		"cut" = 0.75,
+		"blunt" = 0.75,
 	},
 	"medium" = {
 		"hack" = 0.75,
 		"piercing" = 1,
-		"cut" = 0.5,
+		"cut" = 0.75,
+		"blunt" = 0.75,
+	},
+	"heavy" = {
+		"hack" = 0.5,
+		"piercing" = 0.75,
+		"cut" = 0.25,
+		"blunt" = 1,
 	},
 	"building" = {
 		"hack" = 0.75,
 		"piercing" = 0.25,
 		"cut" = 0,
+		"blunt" = 1,
 	},
 }
 @export var lumber = 0
@@ -234,6 +259,17 @@ var what = null
 		"cancel" = true,
 	}
 }
+var stats = {
+	"resources gathered" = 0,
+	"resources spent" = 0,
+	"units lost(in value)" = 0,
+	"units killed(in value)" = 0,
+	"units produced" = 0,
+	"units lost" = 0,
+	"units killed" = 0,
+	"workers produced" = 0,
+	"buildings produced" = 0
+}
 func _ready() -> void:
 	if get_parent().get_parent().type != player:
 		active = false
@@ -241,6 +277,7 @@ func _ready() -> void:
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 	else:
 		selectedall = get_tree().get_nodes_in_group("selected")
+	stats["resources gathered"] += lumber
 	command()
 
 func _to_world(screen_pos: Vector2) -> Vector2:
@@ -329,6 +366,16 @@ func command():
 	$UI_buttons_build.visible = false
 	$UI_buttons_cancel.visible = false
 	if first != null:
+		if first.queue.size() == 0:
+			get_node("UI_buttons/cancel").disabled = true
+		else:
+			get_node("UI_buttons/cancel").disabled = false
+		if first.carrying.size() == 0:
+			get_node("UI_buttons/return").disabled = true
+			get_node("UI_buttons/gather").disabled = false
+		else:
+			get_node("UI_buttons/return").disabled = false
+			get_node("UI_buttons/gather").disabled = true
 		if build and first.alive:
 			$UI_buttons_build.visible = true
 			for i in $UI_buttons_build.get_children():
@@ -399,10 +446,12 @@ func stopbox():
 		for u in get_tree().get_nodes_in_group("unit"):
 			u.selected = false
 			u.is_main = false
+			u.queue_redraw()
 		for u in get_tree().get_nodes_in_group(player):
 			var r = unit[u.type]["size"]
 			if box.grow(r).has_point(u.global_position):
 				u.selected = true
+				u.queue_redraw()
 	pointa = null
 	pointb = null
 	pointaevent = null
@@ -519,6 +568,7 @@ func select(event):
 		var ranger = units[i].main.unit[units[i].type]["size"] + 4
 		units[i].selected = false
 		units[i].is_main = false
+		units[i].queue_redraw()
 		if best == null and world_pos.distance_to(units[i].global_position) <= ranger:
 			best = units[i]
 		elif best != null:
@@ -527,6 +577,7 @@ func select(event):
 	if best != null:
 		best.selected = true
 		best.is_main = true
+		best.queue_redraw()
 	build = false
 
 func _move() -> void:
@@ -557,16 +608,11 @@ func modify():
 	return "stop"
 
 func learn():
-	draww["warrior"] = [[Vector2(pos[0] - 10, pos[1] - 10), Vector2(pos[0] + 10, pos[1] - 10), Vector2(pos[0] + 10, pos[1] + 10), Vector2(pos[0], pos[1] + 20), Vector2(pos[0] - 10, pos[1] + 10)], Color("9b7600ff")]
-	draww["archer"] = [[Vector2(pos[0] - 10, pos[1] + 15), Vector2(pos[0] - 5, pos[1]), Vector2(pos[0], pos[1] - 5), Vector2(pos[0] + 15, pos[1] - 10)], Color("632900ff")]
-	draww["barracks"] = [[Vector2(pos[0] - 5, pos[1]), Vector2(pos[0], pos[1] - 5), Vector2(pos[0] + 5, pos[1])], Color("ebdcd3ff")]
-	draww["command centre"] = [[Vector2(pos[0] - 5, pos[1]), Vector2(pos[0], pos[1] - 5), Vector2(pos[0] + 5, pos[1])], Color("ebdcd3ff")]
-	draww["farm"] = [[Vector2(pos[0] - 5, pos[1]), Vector2(pos[0], pos[1] - 5), Vector2(pos[0] + 5, pos[1])], Color("ebdcd3ff")]
-	draww["watchtower"] = [[Vector2(pos[0] - 5, pos[1]), Vector2(pos[0], pos[1] - 5), Vector2(pos[0] + 5, pos[1])], Color("ebdcd3ff")]
-	draww["civilian"] = [[Vector2(pos[0] - 5, pos[1]), Vector2(pos[0], pos[1] - 5), Vector2(pos[0] + 5, pos[1])], Color("ebdcd3ff")]
-	draww["worker"] = [[Vector2(pos[0] - 10, pos[1] + 10), Vector2(pos[0] + 5, pos[1] - 5), Vector2(pos[0], pos[1] - 7.5), Vector2(pos[0] + 10, pos[1] - 7.5), Vector2(pos[0] + 10, pos[1]), Vector2(pos[0] +5, pos[1] - 2.5), Vector2(pos[0] - 7.5, pos[1] + 10)], Color("b3a29dff")]
-	draww["cavalry"] = [[Vector2(pos[0] - 10, pos[1] + 10), Vector2(pos[0] - 10, pos[1]), Vector2(pos[0], pos[1] - 5), Vector2(pos[0] + 9, pos[1] - 5), Vector2(pos[0] + 9, pos[1] - 3), Vector2(pos[0] + 4, pos[1] - 3), Vector2(pos[0] +4, pos[1] + 10), Vector2(pos[0] + 1, pos[1] + 10), Vector2(pos[0] +1, pos[1] + 3), Vector2(pos[0] -7, pos[1] + 3), Vector2(pos[0] -7, pos[1] + 10)], Color("ebdcd3ff")]
-
+	for i in unit.keys():
+		draww[i] = [Polygons.get_node(str(i)).polygon, Polygons.get_node(str(i)).color]
+	for i in draww.keys():
+		for u in range(draww[i][0].size()):
+			draww[i][0][u] += pos
 
 func _on_attack_pressed() -> void:
 	selecting = true

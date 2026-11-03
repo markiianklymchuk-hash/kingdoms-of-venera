@@ -9,7 +9,7 @@ var colors = {
 }
 @export var type = ""
 @export var side = 0
-
+@export var starting_health = 1.0
 var main 
 var pos = Vector2(0,0)
 var draww = {}
@@ -33,8 +33,11 @@ var what = null
 var BLOCK_MASK = 0b110
 var rally = null
 var scenario 
+var effex = []
+var possiblefx = ["regenerate"]
 
 func _ready() -> void:
+	queue_redraw()
 	main = get_parent().get_node("C/" + str(side))
 	scenario= get_parent()
 	if main.unit[type]["speed"] == 0:
@@ -43,29 +46,30 @@ func _ready() -> void:
 	else:
 		building= false
 		set_collision_layer_value(1, true)
-	hp = main.unit[type]["health"]
+	hp = main.unit[type]["health"] * starting_health
+	starting_health = 1
 	add_to_group("unit")
 	add_to_group(str(side))
 	$colider.shape = $colider.shape.duplicate()
 	$colider.shape.radius = main.unit[type]["size"]
+	manage_fx(main.unit[type]["commands"], type)
+	if building:
+		main.stats["buildings produced"] += 1
+	elif main.unit[type]["commands"].has("worker"):
+		main.stats["workers produced"] += 1
+	else:
+		main.stats["units produced"] += 1
+
+func manage_fx(fx, where_to_look):
+	for i in fx:
+		if possiblefx.has(i):
+			effex.append(main.unit[where_to_look][i])
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	queue_redraw()
+func _physics_process(delta: float) -> void:
 	if alive:
 		cd -= delta
-		if is_main:
-			if queue.size() == 0:
-				main.get_node("UI_buttons/cancel").disabled = true
-			else:
-				main.get_node("UI_buttons/cancel").disabled = false
-			if carrying.size() == 0:
-				main.get_node("UI_buttons/return").disabled = true
-				main.get_node("UI_buttons/gather").disabled = false
-			else:
-				main.get_node("UI_buttons/return").disabled = false
-				main.get_node("UI_buttons/gather").disabled = true
 		handle_shit(delta)
 	else:
 		if mode == "cancel":
@@ -83,16 +87,17 @@ func _process(delta: float) -> void:
 			
 
 func die():
-		queue_free()
-		if selected:
-			main.selectedall.erase(self)
-		for i in get_groups():
-			remove_from_group(i)
-		if queue.size() >= 1:
-			for i in queue:
-				queue.erase(i)
-				main.lumber += main.unit[type][i + " lumber"]
-			
+	queue_free()
+	if selected:
+		main.selectedall.erase(self)
+	for i in get_groups():
+		remove_from_group(i)
+	if queue.size() >= 1:
+		for i in queue:
+			queue.erase(i)
+			main.lumber += main.unit[type][i + " lumber"]
+	main.stats["units lost(in value)"] += main.unit[type]["value"]
+	main.stats["units lost"] += 1
 
 
 func learn():
@@ -167,6 +172,7 @@ func search_for_dropoff():
 		mode = "return"
 	else:
 		mode = "idle"
+	main.command()
 
 
 func search_for_resourse():
@@ -185,16 +191,36 @@ func search_for_resourse():
 		mode = "gather"
 	else:
 		mode = "idle"
+	main.command()
 	
 func damage():
-	var full_damage = max(main.unit[type]["damage"] * main.damage_matrix[target.main.unit[target.type]["armor type"]][main.unit[type]["damage type"]] - target.main.unit[target.type]["armor"], 0) 
+	var washp = target.hp
+	var full_damage = max(main.unit[type]["damage"] * main.damage_matrix[target.main.unit[target.type]["armor type"]][main.unit[type]["damage type"]], 0) 
 	target.hp -= full_damage
 	if target.hp <= 0:
-		target = null
 		mode = "idle"
 		currently_attacking = false
+		if washp > 0:
+			kill(target)
+		target = null
+
+func kill(who):
+	main.stats["units killed(in value)"] += main.unit[who.type]["value"]
+	main.stats["units killed"] += 1
+
+func apply_fx(typeis, delta):
+	if typeis == "everyframe":
+		for i in effex:
+			if i[0] == "regenerate":
+				heal(self, i[1] * delta)
+
+func heal(who, how_much):
+	who.hp += how_much
+	if who.hp > main.unit[who.type]["health"]:
+		who.hp = main.unit[who.type]["health"]
 
 func handle_shit(delta):
+	apply_fx("everyframe", delta)
 	if mode == "move":
 		progress = 0
 		if !main.unit[type]["commands"].has(mode):
@@ -217,7 +243,7 @@ func handle_shit(delta):
 			dir = global_position.direction_to(wastarget.global_position)
 			if global_position.distance_to(wastarget.global_position) <= 1.5 * (main.unit[type]["size"] + main.unit[wastarget.type]["size"]):
 				dir = Vector2.ZERO
-		velocity = dir * main.unit[type]["speed"] * delta
+		velocity = dir * main.unit[type]["speed"]
 	if mode == "gather":
 		wasmode = mode
 		currently_attacking = false
@@ -246,7 +272,7 @@ func handle_shit(delta):
 				return
 		else:
 			progress = 0
-		velocity = dir * main.unit[type]["speed"] * delta
+		velocity = dir * main.unit[type]["speed"]
 	if mode == "building":
 		wasmode = mode
 		currently_attacking = false
@@ -259,11 +285,12 @@ func handle_shit(delta):
 				dir = Vector2.ZERO
 				build(what)
 				main.lumber -= main.unit[type][what + " lumber"]
+				main.stats["resources spent"] += main.unit[type][what + " lumber"]
 				what = null
 			elif main.lumber < main.unit[type][what + " lumber"]:
 				main.error("not enough lumber", 1)
 				mode = "idle"
-		velocity = dir * main.unit[type]["speed"] * delta
+		velocity = dir * main.unit[type]["speed"]
 	if mode == "build":
 		wasmode = mode
 		currently_attacking = false
@@ -290,7 +317,7 @@ func handle_shit(delta):
 				if target.hp > main.unit[target.type]["health"]:
 					target.hp = main.unit[target.type]["health"]
 				return
-		velocity = dir * main.unit[type]["speed"] * delta
+		velocity = dir * main.unit[type]["speed"]
 	if mode == "return":
 		wasmode = mode
 		currently_attacking = false
@@ -303,8 +330,9 @@ func handle_shit(delta):
 			if carrying.has("lumber"):
 				carrying.erase("lumber")
 				main.lumber += main.unit[type]["how much"]
+				main.stats["resources gathered"] += main.unit[type]["how much"]
 				search_for_resourse()
-		velocity = dir * main.unit[type]["speed"] * delta
+		velocity = dir * main.unit[type]["speed"]
 	if mode == "idle":
 		progress = 0
 		wasmode = mode
@@ -318,6 +346,7 @@ func handle_shit(delta):
 		if queue.size() < 5 and main.lumber >= main.unit[type][what +" lumber"]:
 			queue.append(what)
 			main.lumber -= main.unit[type][what + " lumber"]
+			main.stats["resources spent"] += main.unit[type][what + " lumber"]
 			what = null
 		elif main.lumber < main.unit[type][what + " lumber"]:
 			main.error("not enough lumber", 1)
@@ -342,6 +371,7 @@ func handle_shit(delta):
 		velocity = Vector2(0,0)
 		if queue.size() > 0:
 			main.lumber += main.unit[type][queue[queue.size() - 1] + " lumber"]
+			main.stats["resources spent"] -= main.unit[type][queue[queue.size() - 1] + " lumber"]
 			queue.remove_at(queue.size() - 1)
 		if queue.size() != 0:
 			mode = "buy"
@@ -393,7 +423,7 @@ func handle_shit(delta):
 				attack(target, null)
 			else:
 				currently_attacking = false
-		velocity = dir * main.unit[type]["speed"] * delta
+		velocity = dir * main.unit[type]["speed"]
 
 func create_unit(unitt):
 	var who = load("res://unit.tscn").instantiate()

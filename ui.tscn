@@ -155,7 +155,21 @@ disabled = true
 text = "dropoff point"
 autowrap_mode = 2
 
+[node name="regenerate" type="Button" parent="UI_buttons" unique_id=59382330]
+layout_mode = 0
+offset_top = 100.0
+offset_right = 140.0
+offset_bottom = 200.0
+disabled = true
+text = "regeneration"
+autowrap_mode = 2
+
 [node name="create" type="Control" parent="UI_buttons" unique_id=1361969146]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="worker" type="Control" parent="UI_buttons" unique_id=929324838]
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
