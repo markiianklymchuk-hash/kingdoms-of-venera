@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://boctr11qxdgam"]
+
+[ext_resource type="Script" uid="uid://co8f1pgu4lw1s" path="res://briefing.gd" id="1_thqkt"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_thqkt"]
+bg_color = Color(0.6, 0.6, 0.6, 0.22745098)
+
+[node name="briefing" type="Control" unique_id=1125229359]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_thqkt")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=51247906]
+layout_mode = 0
+offset_right = 1152.0
+offset_bottom = 648.0
+color = Color(0.6669311, 0.6392267, 0.64094305, 0.22352941)
+
+[node name="Label" type="Label" parent="." unique_id=57508317]
+layout_mode = 0
+offset_right = 800.0
+offset_bottom = 648.0
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_thqkt")
+autowrap_mode = 2
+
+[node name="Button" type="Button" parent="." unique_id=1543760825]
+layout_mode = 0
+offset_left = 800.0
+offset_top = 568.0
+offset_right = 1152.0
+offset_bottom = 648.0
+theme_override_font_sizes/font_size = 32
+text = "start"
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
