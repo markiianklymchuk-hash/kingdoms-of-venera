@@ -10,10 +10,14 @@ config_version=5
 
 [application]
 
-config/name="rtslearn"
+config/name="Kingdoms of Venera"
 run/main_scene="uid://c1kq6ehlsd7qq"
 config/features=PackedStringArray("4.7", "Mobile")
 config/icon="res://icon.svg"
+
+[autoload]
+
+Polygons="*uid://7slwxdffkk7e"
 
 [display]
 

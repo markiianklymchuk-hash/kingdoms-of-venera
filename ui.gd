@@ -3,13 +3,16 @@ extends Control
 var unit = {
 	"warrior" = {
 		"size" = 16,
+		"flying" = false,
 		"aggro" = 300,
+		"vision" = 350,
 		"supply" = -2,
+		"value" = 60,
 		"health" = 110,
-		"speed" = 2200,
+		"speed" = 35,
 		"damage" = 10,
 		"damage type" = "hack",
-		"armor" = 3,
+		"target" = 1,
 		"armor type" = "medium",
 		"range" = 15,
 		"cooldown" = 1.0,
@@ -17,39 +20,47 @@ var unit = {
 	},
 	"worker" = {
 		"size" = 10,
+		"flying" = false,
 		"aggro" = 300,
+		"vision" = 350,
 		"supply" = -1,
+		"value" = 25,
 		"health" = 60,
-		"speed" = 2600,
+		"speed" = 45,
 		"damage" = 5,
 		"damage type" = "hack",
-		"armor" = 0,
 		"armor type" = "unarmoured",
+		"target" = 1,
 		"range" = 15,
 		"cooldown" = 2.0,
 		"gather" = 5,
 		"how much" = 10,
 		"search" = 300,
 		"barracks lumber" = 150,
-		"barracks time" = 45,
+		"barracks time" = 60,
 		"command centre lumber" = 375,
 		"command centre time" = 60,
 		"farm lumber" = 100,
 		"farm time" = 20,
 		"watchtower lumber" = 125,
 		"watchtower time" = 25,
-		"commands" = ["move", "attack", "stop", "defend", "gather", "return", "build", "continue building"],
-		"build commands" = ["build barracks", "build command centre", "build farm", "back", "build watchtower"],
+		"hero altar lumber" = 125,
+		"hero altar time" = 60,
+		"commands" = ["move", "attack", "stop", "defend", "gather", "return", "build", "continue building", "worker"],
+		"build commands" = ["build barracks", "build command centre", "build farm", "back", "build watchtower", "build hero altar"],
 	},
 	"archer" = {
 		"size" = 12,
+		"flying" = false,
 		"aggro" = 400,
+		"vision" = 400,
 		"supply" = -2,
+		"value" = 60,
 		"health" = 80,
-		"speed" = 2400,
+		"speed" = 40,
 		"damage" = 10,
 		"damage type" = "piercing",
-		"armor" = 0,
+		"target" = 2,
 		"armor type" = "unarmoured",
 		"range" = 200,
 		"cooldown" = 3.0,
@@ -57,13 +68,16 @@ var unit = {
 	},
 	"cavalry" = {
 		"size" = 20,
+		"flying" = false,
 		"aggro" = 400,
+		"vision" = 400,
 		"supply" = -3,
+		"value" = 85,
 		"health" = 120,
-		"speed" = 5200,
+		"speed" = 80,
 		"damage" = 5,
 		"damage type" = "cut",
-		"armor" = 2,
+		"target" = 1,
 		"armor type" = "light",
 		"range" = 10,
 		"cooldown" = 0.3,
@@ -71,27 +85,33 @@ var unit = {
 	}, 
 	"civilian" = {
 		"size" = 8,
+		"flying" = false,
 		"aggro" = 0,
+		"vision" = 250,
 		"supply" = -1,
+		"value" = 0,
 		"health" = 40,
-		"speed" = 2400,
+		"speed" = 40,
 		"damage" = 0,
 		"damage type" = "unarmed",
-		"armor" = 0,
+		"target" = 0,
 		"armor type" = "unarmoured",
 		"range" = 200,
 		"cooldown" = -1,
-		"commands" = ["move", "stop", "defend"],
+		"commands" = ["move", "stop"],
 	},
 	"barracks" = {
 		"size" = 68,
+		"flying" = false,
 		"aggro" = 0,
+		"vision" = 350,
 		"supply" = 0,
+		"value" = 150,
 		"health" = 1400,
 		"speed" = 0,
 		"damage" = 0,
 		"damage type" = "unarmed",
-		"armor" = 5,
+		"target" = 0,
 		"armor type" = "building",
 		"range" = 400,
 		"cooldown" = -1,
@@ -107,13 +127,17 @@ var unit = {
 	}, 
 	"command centre" = {
 		"size" = 80,
+		"flying" = false,
 		"aggro" = 0,
+		"vision" = 500,
 		"supply" = 10,
+		"value" = 375,
 		"health" = 2000,
 		"speed" = 0,
+		"dropoff point" = ["dropoff point"],
 		"damage" = 0,
 		"damage type" = "unarmed",
-		"armor" = 5,
+		"target" = 0,
 		"armor type" = "building",
 		"range" = 400,
 		"cooldown" = -1,
@@ -123,15 +147,40 @@ var unit = {
 		"commands" = ["create worker", "cancel", "dropoff point",  "create", "rally"],
 		"cancel commands" = ["cancel"],
 	}, 
+	"hero altar" = {
+		"size" = 60,
+		"flying" = false,
+		"aggro" = 0,
+		"vision" = 350,
+		"supply" = 0,
+		"value" = 125,
+		"health" = 1200,
+		"speed" = 0,
+		"damage" = 0,
+		"damage type" = "unarmed",
+		"target" = 0,
+		"armor type" = "building",
+		"range" = 400,
+		"cooldown" = -1,
+		"hero altar time" = 60,
+		"hero time" = 60,
+		"the paladin time" = 60,
+		"the paladin lumber" = 100,
+		"commands" = ["revive hero 1", "revive hero 2", "revive hero 3", "cancel", "rally", "revive", "summon the paladin", "create"],
+		"cancel commands" = ["cancel"],
+	}, 
 	"farm" = {
 		"size" = 36,
+		"flying" = false,
 		"aggro" = 0,
+		"vision" = 200,
 		"supply" = 8,
+		"value" = 100,
 		"health" = 800,
 		"speed" = 0,
 		"damage" = 0,
 		"damage type" = "unarmed",
-		"armor" = 3,
+		"target" = 1,
 		"armor type" = "building",
 		"range" = 400,
 		"cooldown" = -1,
@@ -141,43 +190,105 @@ var unit = {
 	}, 
 	"watchtower" = {
 		"size" = 32,
+		"flying" = false,
 		"aggro" = 300,
+		"vision" = 500,
 		"supply" = 0,
+		"value" = 125,
 		"health" = 300,
 		"speed" = 0,
 		"damage" = 14,
 		"damage type" = "piercing",
-		"armor" = 3,
+		"target" = 2,
 		"armor type" = "building",
 		"range" = 240,
-		"cooldown" = 2,
+		"cooldown" = 2.0,
 		"watchtower time" = 25,
 		"commands" = ["attack", "stop"],
 		"cancel commands" = ["cancel"],
 	}, 
+	"the paladin" = {
+		"size" = 20,
+		"flying" = false,
+		"aggro" = 300,
+		"vision" = 350,
+		"supply" = -2,
+		"value" = 500,
+		"health" = 200,
+		"speed" = 40,
+		"regenerate" = ["regenerate", 1],
+		"regenerate req" = ["herolvl", 1, false],
+		"holy light heal" = 60,
+		"holy light cooldown" = 5,
+		"holy light ability slot" = 5,
+		"hero ability holy light req" = ["herolvl", 2, true],
+		"damage" = 14,
+		"damage type" = "blunt",
+		"target" = 1,
+		"armor type" = "heavy",
+		"range" = 20,
+		"cooldown" = 3.0,
+		"commands" = ["move", "attack", "stop", "defend", "regenerate", "hero ability holy light", "hero"],
+	}, 
+	"bird" = {
+		"size" = 4,
+		"flying" = true,
+		"aggro" = 200,
+		"vision" = 200,
+		"supply" = 0,
+		"value" = 0,
+		"health" = 20,
+		"speed" = 100,
+		"damage" = 0,
+		"damage type" = "unarmed",
+		"target" = 0,
+		"armor type" = "unarmoured",
+		"range" = 0,
+		"cooldown" = -1.0,
+		"commands" = ["move", "stop"],
+	},
 }
 var damage_matrix = {
 	"unarmoured" = {
-		"hack" = 0.75,
-		"piercing" = 0.5,
+		"hack" = 0.8,
+		"piercing" = 0.6,
 		"cut" = 1,
+		"blunt" = 0.4,
 	},
 	"light" = {
 		"hack" = 1,
-		"piercing" = 0.75,
-		"cut" = 0.75,
+		"piercing" = 0.8,
+		"cut" = 0.8,
+		"blunt" = 0.5,
 	},
 	"medium" = {
-		"hack" = 0.75,
+		"hack" = 0.7,
 		"piercing" = 1,
-		"cut" = 0.5,
+		"cut" = 0.6,
+		"blunt" = 0.75,
+	},
+	"heavy" = {
+		"hack" = 0.5,
+		"piercing" = 0.8,
+		"cut" = 0.3,
+		"blunt" = 1,
 	},
 	"building" = {
-		"hack" = 0.75,
-		"piercing" = 0.25,
+		"hack" = 0.6,
+		"piercing" = 0.1,
 		"cut" = 0,
+		"blunt" = 1,
 	},
 }
+var heros = {}
+var herolvl = 1
+var techtree = {
+	"command centre" = [false, "build barracks", "build farm"],
+	"barracks" = [false, "build watchtower", "build hero altar"],
+	"farm" = [false, "create cavalry"],
+	"hero altar" = [false, "herolvl 2"],
+}
+var target_matrix = [[false, false, false], [false, true, true], [true, true, true]]
 @export var lumber = 0
 var currentsupply = 0
 var supply = 0
@@ -229,11 +340,63 @@ var what = null
 		"build command centre" = true,
 		"build farm" = true,
 		"build watchtower" = true,
+		"build hero altar" = true,
 	},
 	"UI_buttons_cancel" = {
 		"cancel" = true,
+	},
+	"UI_text" = {
+		"next" = true,
+		"dragin" = true,
+	},
+	"selectmult" = {
+		"selectmult" = true,
 	}
 }
+var stats = {
+	"resources gathered" = 0,
+	"resources spent" = 0,
+	"units lost(in value)" = 0,
+	"units killed(in value)" = 0,
+	"units produced" = 0,
+	"units lost" = 0,
+	"units killed" = 0,
+	"workers produced" = 0,
+	"buildings produced" = 0
+}
+@onready var fog = get_parent().get_parent().get_node("fog")
+
+func check_for_heros():
+	herolvl = 1
+	for i in techtree.keys():
+		if techtree[i].has("herolvl 2") and herolvl < 2 and techtree[i][0]:
+			herolvl = 2
+		if techtree[i].has("herolvl 3") and herolvl < 3 and techtree[i][0]:
+			herolvl = 3
+	for i in get_tree().get_nodes_in_group(player):
+		if unit[i.type]["commands"].has("hero") and i.truehero:
+			if !heros.has(i.type):
+				heros[i.type] = true
+		for u in i.queue:
+			if unit[u]["commands"].has("hero"):
+				heros[i.type] = true
+		if unit[i.type]["commands"].has("hero"):
+			for u in unit[i.type]["commands"]:
+				if unit[i.type].has(u + " req"):
+					if unit[i.type][u + " req"][0] == "herolvl" and !unit[i.type][u + " req"][2]:
+						if herolvl >= unit[i.type][u + " req"][1]:
+							i.manage_fx("add", u, unit[i.type][u])
+						else:
+							i.manage_fx("dda", u, unit[i.type][u])
+	for i in heros.keys():
+		var is_it = false
+		for u in get_tree().get_nodes_in_group(player):
+			if u.type == i or u.queue.has(i):
+				is_it = true
+		heros[i] = is_it
+		if !is_it and !selectedall.is_empty() and unit[selectedall[0].type]["commands"].has("revive"):
+			command()
+
 func _ready() -> void:
 	if get_parent().get_parent().type != player:
 		active = false
@@ -241,6 +404,7 @@ func _ready() -> void:
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 	else:
 		selectedall = get_tree().get_nodes_in_group("selected")
+	stats["resources gathered"] += lumber
 	command()
 
 func _to_world(screen_pos: Vector2) -> Vector2:
@@ -265,7 +429,14 @@ func _unhandled_input(event: InputEvent) -> void:
 			await get_tree().process_frame
 			command()
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
+func check_tree():
+	for i in techtree.keys():
+		techtree[i][0] = false
+	for i in get_tree().get_nodes_in_group(player):
+		if techtree.keys().has(i.type) and i.alive:
+			techtree[i.type][0] = true
+		
+
 func _process(_delta: float) -> void:
 	queue_redraw()
 	find_supply()
@@ -293,7 +464,6 @@ func _process(_delta: float) -> void:
 			$UI_text/next.visible = false
 		else:
 			refresh()
-		
 	else:
 		first = selectedall[0]
 		if is_instance_valid(first):
@@ -304,8 +474,6 @@ func _process(_delta: float) -> void:
 
 func refresh():
 	selectedall = get_tree().get_nodes_in_group("selected")
-	if selectedall.size() != 0:
-		selectedall[0].is_main = true
 
 func error(huh, how_long):
 	$stats/error.text = huh
@@ -329,6 +497,16 @@ func command():
 	$UI_buttons_build.visible = false
 	$UI_buttons_cancel.visible = false
 	if first != null:
+		if first.queue.size() == 0:
+			get_node("UI_buttons/cancel").disabled = true
+		else:
+			get_node("UI_buttons/cancel").disabled = false
+		if first.carrying.size() == 0:
+			get_node("UI_buttons/return").disabled = true
+			get_node("UI_buttons/gather").disabled = false
+		else:
+			get_node("UI_buttons/return").disabled = false
+			get_node("UI_buttons/gather").disabled = true
 		if build and first.alive:
 			$UI_buttons_build.visible = true
 			for i in $UI_buttons_build.get_children():
@@ -339,6 +517,14 @@ func command():
 				get_node("UI_buttons_build/" + i).visible = true
 				if i.contains("build "):
 					get_node("UI_buttons_build/" + i).text =  i + " \n" + str(first.main.unit[first.type][i.substr(6) + " lumber"]) +" lumber, +" + str(first.main.unit[i.substr(6)]["supply"]) + " supply"
+			for i in techtree.keys():
+				var disabler = false
+				for u in techtree[i]:
+					if u is bool:
+						disabler = !u
+					else:
+						if u.contains("build "):
+							get_node("UI_buttons_build/"+u).disabled = disabler
 		elif !first.alive:
 			$UI_buttons_cancel.visible = true
 			for i in $UI_buttons_cancel.get_children():
@@ -355,19 +541,49 @@ func command():
 				return
 			for i in first.main.unit[first.type]["commands"]:
 				get_node("UI_buttons/" + i).visible = true
+				if i.contains("revive "):
+					if heros.keys().size() >= int(i.erase(0,12)) and heros[heros.keys()[int(i.erase(0,12)) - 1]] == false:
+						get_node("UI_buttons/" + i).disabled = false
+						get_node("UI_buttons/" + i).text = "revive " + heros.keys()[int(i.erase(0, 12)) - 1] + ": " + str(first.main.unit[heros.keys()[int(i.erase(0, 12)) - 1]]["supply"]) + " supply"
+					else:
+						get_node("UI_buttons/" + i).disabled = true
+						get_node("UI_buttons/" + i).text = "no one to revive"
 				if i.contains("create "):
 					get_node("UI_buttons/" + i).text =  i + " \n" + str(first.main.unit[first.type][i.substr(7) + " lumber"]) +" lumber, " + str(first.main.unit[i.substr(7)]["supply"]) + " supply"
-		for u in available.keys():
-			for i in available[u].keys():
-				if !available[u][i]:
-					get_node(u + "/" + i).visible = false
+				if i.contains("summon "):
+					get_node("UI_buttons/" + i).text =  i + " \n" + str(first.main.unit[first.type][i.substr(7) + " lumber"]) +" lumber, " + str(first.main.unit[i.substr(7)]["supply"]) + " supply"
+					get_node("UI_buttons/" + i).visible = true
+					for u in heros.keys():
+						if i.contains(u):
+							get_node("UI_buttons/" + i).visible = false
+				if i.contains("hero ability "):
+					if unit[first.type][i + " req"][0] == "herolvl":
+						if herolvl >= unit[first.type][i + " req"][1]:
+							get_node("UI_buttons/" + i).disabled = false
+						else:
+							get_node("UI_buttons/" + i).disabled = true
+			for i in techtree.keys():
+				var disabler = false
+				for u in techtree[i]:
+					if u is bool:
+						disabler = !u
+					else:
+						if u.contains("create "):
+							get_node("UI_buttons/"+u).disabled = disabler
 	else:
 		$UI_buttons.visible = false
 		$UI_buttons_build.visible = false
+	$selectmult/selectmult.visible = true
+	$UI_text/dragin.visible = true
+	$UI_text/next.visible = true
+	for u in available.keys():
+		for i in available[u].keys():
+			if !available[u][i]:
+				get_node(u + "/" + i).visible = false
 
 func dragg(event):
 	var camera = get_parent().get_parent().get_node("Camera")
-	if !dragsel:
+	if !dragsel or dragin:
 		camera.position -= event.relative / camera.zoom
 		if camera.position.x <= camera.get_parent().cameralimits[0]:
 			camera.position.x = camera.get_parent().cameralimits[0]
@@ -377,7 +593,6 @@ func dragg(event):
 			camera.position.y = camera.get_parent().cameralimits[2]
 		if camera.position.y >= camera.get_parent().cameralimits[3]:
 			camera.position.y = camera.get_parent().cameralimits[3]
-		
 	else:
 		refresh()
 		lasttap = "select"
@@ -398,11 +613,16 @@ func stopbox():
 		var box = Rect2(_to_world(pointaevent), Vector2.ZERO).expand(_to_world(pointbevent))
 		for u in get_tree().get_nodes_in_group("unit"):
 			u.selected = false
-			u.is_main = false
+			u.queue_redraw()
+		var firstmade = false
 		for u in get_tree().get_nodes_in_group(player):
 			var r = unit[u.type]["size"]
 			if box.grow(r).has_point(u.global_position):
 				u.selected = true
+				u.queue_redraw()
+				if !firstmade:
+					firstmade = true
+					first = u
 	pointa = null
 	pointb = null
 	pointaevent = null
@@ -476,6 +696,7 @@ func do(event):
 			if u.is_in_group(player) and unit[u.type]["commands"].has(actualmode):
 				if mode == "attack":
 					u.is_atacking_from_order = true
+					u.searchtimer = 0
 				else:
 					u.is_atacking_from_order = false
 				if target != null:
@@ -484,7 +705,7 @@ func do(event):
 					if mode == "attack":
 						u.wastarget = target
 				else:
-					if mode == "gather":
+					if mode == "gather" or mode == "holy light":
 						u.target = null
 					else:
 						u.mode = mode
@@ -518,7 +739,7 @@ func select(event):
 		var units = get_tree().get_nodes_in_group("unit")
 		var ranger = units[i].main.unit[units[i].type]["size"] + 4
 		units[i].selected = false
-		units[i].is_main = false
+		units[i].queue_redraw()
 		if best == null and world_pos.distance_to(units[i].global_position) <= ranger:
 			best = units[i]
 		elif best != null:
@@ -526,7 +747,8 @@ func select(event):
 				best = units[i]
 	if best != null:
 		best.selected = true
-		best.is_main = true
+		first = best
+		best.queue_redraw()
 	build = false
 
 func _move() -> void:
@@ -536,37 +758,24 @@ func _move() -> void:
 
 
 func modify():
-	if mode == "move":
-		return "move"
-	if mode == "rally":
-		return "rally"
-	if mode == "gather":
-		return "gather"
-	if mode == "attack":
-		return "attack"
+	if mode == "idle":
+		return "stop"
 	if mode == "defence":
 		return "defend"
-	if mode == "return":
-		return "return"
-	if mode == "building":
-		return "building"
 	if mode == "creating":
 		return "create"
-	if mode == "cancel":
-		return "cancel"
-	return "stop"
+	if mode == "holy light":
+		return "hero ability holy light"
+	if mode == "summon":
+		return "create"
+	return mode
 
 func learn():
-	draww["warrior"] = [[Vector2(pos[0] - 10, pos[1] - 10), Vector2(pos[0] + 10, pos[1] - 10), Vector2(pos[0] + 10, pos[1] + 10), Vector2(pos[0], pos[1] + 20), Vector2(pos[0] - 10, pos[1] + 10)], Color("9b7600ff")]
-	draww["archer"] = [[Vector2(pos[0] - 10, pos[1] + 15), Vector2(pos[0] - 5, pos[1]), Vector2(pos[0], pos[1] - 5), Vector2(pos[0] + 15, pos[1] - 10)], Color("632900ff")]
-	draww["barracks"] = [[Vector2(pos[0] - 5, pos[1]), Vector2(pos[0], pos[1] - 5), Vector2(pos[0] + 5, pos[1])], Color("ebdcd3ff")]
-	draww["command centre"] = [[Vector2(pos[0] - 5, pos[1]), Vector2(pos[0], pos[1] - 5), Vector2(pos[0] + 5, pos[1])], Color("ebdcd3ff")]
-	draww["farm"] = [[Vector2(pos[0] - 5, pos[1]), Vector2(pos[0], pos[1] - 5), Vector2(pos[0] + 5, pos[1])], Color("ebdcd3ff")]
-	draww["watchtower"] = [[Vector2(pos[0] - 5, pos[1]), Vector2(pos[0], pos[1] - 5), Vector2(pos[0] + 5, pos[1])], Color("ebdcd3ff")]
-	draww["civilian"] = [[Vector2(pos[0] - 5, pos[1]), Vector2(pos[0], pos[1] - 5), Vector2(pos[0] + 5, pos[1])], Color("ebdcd3ff")]
-	draww["worker"] = [[Vector2(pos[0] - 10, pos[1] + 10), Vector2(pos[0] + 5, pos[1] - 5), Vector2(pos[0], pos[1] - 7.5), Vector2(pos[0] + 10, pos[1] - 7.5), Vector2(pos[0] + 10, pos[1]), Vector2(pos[0] +5, pos[1] - 2.5), Vector2(pos[0] - 7.5, pos[1] + 10)], Color("b3a29dff")]
-	draww["cavalry"] = [[Vector2(pos[0] - 10, pos[1] + 10), Vector2(pos[0] - 10, pos[1]), Vector2(pos[0], pos[1] - 5), Vector2(pos[0] + 9, pos[1] - 5), Vector2(pos[0] + 9, pos[1] - 3), Vector2(pos[0] + 4, pos[1] - 3), Vector2(pos[0] +4, pos[1] + 10), Vector2(pos[0] + 1, pos[1] + 10), Vector2(pos[0] +1, pos[1] + 3), Vector2(pos[0] -7, pos[1] + 3), Vector2(pos[0] -7, pos[1] + 10)], Color("ebdcd3ff")]
-
+	for i in unit.keys():
+		draww[i] = [Polygons.get_node(str(i)).polygon, Polygons.get_node(str(i)).color]
+	for i in draww.keys():
+		for u in range(draww[i][0].size()):
+			draww[i][0][u] += pos
 
 func _on_attack_pressed() -> void:
 	selecting = true
@@ -611,14 +820,16 @@ func _draw():
 		var box = Rect2(pointaevent, Vector2.ZERO).expand(pointbevent)
 		draw_rect(box, Color(0, 1, 0, 0.3))
 		draw_rect(box, Color(0, 1, 0, 0.9), false, 2.0)
-
 	if first == null or str(first.side) != player:
 		return
 	if first.queue.size() > 0:
 		pos = Vector2(425, 475)
 		learn()
 		draw_line(pos + Vector2(25, 0), pos + Vector2(75,0), Color("000000ff"), 2)
-		draw_line(pos + Vector2(25, 0), pos + Vector2(25 + 50 * first.progress / first.main.unit[first.type][first.queue[0] + " time"],0), Color("ffff00ff"), 2)
+		if unit[first.type].has("hero time"):
+			draw_line(pos + Vector2(25, 0), pos + Vector2(25 + 50 * first.progress / unit[first.type]["hero time"],0), Color("ffff00ff"), 2)
+		else:
+			draw_line(pos + Vector2(25, 0), pos + Vector2(25 + 50 * first.progress / unit[first.type][first.queue[0] + " time"],0), Color("ffff00ff"), 2)
 		draw_colored_polygon(draww[first.queue[0]][0],draww[first.queue[0]][1])
 	if first.queue.size() > 1:
 		pos = Vector2(475, 525)
@@ -642,10 +853,9 @@ func _on_next_pressed() -> void:
 	var unitk = selectedall[0]
 	selectedall.erase(unitk)
 	selectedall.append(unitk)
-	for i in selectedall:
-		i.is_main = false
-	if selectedall.size() != 0:
-		selectedall[0].is_main = true
+	first = selectedall[0]
+	for u in selectedall:
+		u.queue_redraw()
 	await get_tree().process_frame
 	await get_tree().process_frame
 	command()
@@ -756,3 +966,30 @@ func _on_build_watchtower_pressed() -> void:
 	mode = "building"
 	what = "watchtower"
 	oneunit= true
+
+
+func _on_holy_light_pressed() -> void:
+	selecting = true
+	mode = "holy light"
+	oneunit= false
+
+
+func _on_build_hero_altar_pressed() -> void:
+	selecting = true
+	mode = "building"
+	what = "hero altar"
+	oneunit= true
+
+
+func _on_revive_hero_1_pressed() -> void:
+	selecting = false
+	mode = "revive"
+	what = heros.keys()[0]
+	do_but_cooler()
+
+
+func _on_summon_the_paladin_pressed() -> void:
+	selecting = false
+	mode = "summon"
+	what = "the paladin"
+	do_but_cooler()

@@ -3,8 +3,8 @@
 [ext_resource type="Script" uid="uid://b7wgl3ff87r3y" path="res://tree.gd" id="1_brfkd"]
 [ext_resource type="Texture2D" uid="uid://cpp7agb4btm2c" path="res://sprite-Sheet.png" id="2_nnvrw"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_m8gho"]
-radius = 40.0
+[sub_resource type="CircleShape2D" id="CircleShape2D_u5rpk"]
+radius = 30.0
 
 [node name="tree" type="Node2D" unique_id=2017823324]
 z_index = 2
@@ -15,10 +15,15 @@ collision_layer = 4
 collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=690217781]
-shape = SubResource("CircleShape2D_m8gho")
+shape = SubResource("CircleShape2D_u5rpk")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=458941102]
 z_index = -1
 texture = ExtResource("2_nnvrw")
 region_enabled = true
 region_rect = Rect2(704, 704, 64, 64)
+
+[node name="NavigationObstacle2D" type="NavigationObstacle2D" parent="." unique_id=1858160822 groups=["nav"]]
+vertices = PackedVector2Array(-40, -40, 40, -40, 40, 40, -40, 40)
+affect_navigation_mesh = true
+carve_navigation_mesh = true

@@ -1,17 +1,36 @@
 extends Node2D
 
 var allies = {
-	"0" = ["0", "1"],
+	"0" = ["0", "1", "6"],
 	"1" = ["0", "1"],
-	"2" = ["2"]
+	"2" = ["2", "6"],
+	"6" = ["0", "2", "6"],
 }
+var sidenames = {
+	"0" = "medieval(friendly)",
+	"1" = "medieval(player)",
+	"2" = "medieval(enemy)",
+	"6" = "bandits(enemy)",
+}
+var birdpathes = [Vector2(-860, -50), Vector2(-750, -275), Vector2(-500, 850), Vector2(500, 1000), Vector2(950, 1050), Vector2(950, -600)]
+var gamestate = 0
+var period = 1
 var defcords = [Vector2(-520, -360), Vector2(-500, -120), Vector2(-850, 50), Vector2(-360, 80), Vector2(-660, -300), Vector2(-970, -250), Vector2(-880, 20), Vector2(-460, 800)]
 var objectives = {
 	"main" = ["destroy the enemy base"],
 	"bonus" = ["protect the civilians: ", "build a barracks", "build an army: "],
-	"objectives progress" = [[5,5], true, [0,30, true], true]
+	"objectives progress" = [[5,5, true], true, [0,30, true], true]
 }
-var voicelines = [["Civilian: m'lord! Our enemy wants to kill us all! Please protect us!", true], ["warrior: thanks for rescuing us! we are with you!"], ["scout: enemies incoming!"], ["tip: you can press rally, to tell units where to go when they spawn(also allows automatic gathering)"]]
+var voicelines = [
+	["civilian: m'lord! Our enemy wants to kill us all! Please protect us!", true], 
+	["paladin: thanks for rescuing us! we are with you!"], 
+	["scout: enemies incoming!"],
+	["tip: you can set rally points, so units go somewhere when built"],
+	["advisor: sweet god... the slaughter... avenge them!"],
+	["advisor: we are strong! crush them"],
+	["scout: nearby bandits have captured one of our paladins! rescue him!"],
+	["civilian: these watchtowers are mighty at defence! we should build them"],
+]
 var tutorial_phase = 0
 var defence_force = {
 	"time" = 0,
@@ -92,18 +111,23 @@ var currentlyattacking = {
 }
 var cameralimits = [-850, 1200, -650, 1000]
 @onready var playerUI = $"C/1"
+@onready var end = $"C/aftergame stats"
+
+func _ready() -> void:
+	await get_tree().process_frame
+	do_nav()
+
+func do_nav():
+	$navigation.bake_navigation_polygon()
 
 func _process(delta: float) -> void:
+	handle_spawns()
 	if get_tree().get_node_count_in_group("1") == 0:
-		var main_menu = load("res://main_menu.tscn")
-		main_menu = main_menu.instantiate()
-		get_parent().add_child(main_menu)
-		queue_free()
+		gamestate = -1
 	if get_tree().get_node_count_in_group("buildings") == 0:
-		var main_menu = load("res://main_menu.tscn")
-		main_menu = main_menu.instantiate()
-		get_parent().add_child(main_menu)
-		queue_free()
+		gamestate = 1
+	if gamestate != 0:
+		endit()
 	$mission/mission.queue_redraw()
 	attack_timer += delta
 	for u in get_tree().get_nodes_in_group("2"):
@@ -152,10 +176,12 @@ func find_closest(e):
 				is_friendly = true
 		if !is_friendly:
 			if best == null:
-				best = he
-			else:
-				if e.global_position.distance_to(best.global_position) > e.global_position.distance_to(he.global_position):
+				if e.can_target(he):
 					best = he
+			else:
+				if e.can_target(he):
+					if e.global_position.distance_to(best.global_position) > e.global_position.distance_to(he.global_position):
+						best = he
 	if best != null:
 		return best
 
@@ -250,6 +276,8 @@ func tutorial():
 		$Camera.position = Vector2(530, 20)
 		if get_tree().get_first_node_in_group("tut1").mode == "gather":
 			tutorial_phase = 3
+			get_tree().get_first_node_in_group("tut2").side = 1
+			get_tree().get_first_node_in_group("tut2")._ready()
 	if tutorial_phase == 3:
 		$Camera.position = Vector2(530, 20)
 		if get_tree().get_first_node_in_group("tut2").selected:
@@ -267,7 +295,12 @@ func tutorial():
 		get_tree().get_first_node_in_group("tut2").selected = false
 		get_tree().get_first_node_in_group("tut2").is_main = false
 		get_tree().get_first_node_in_group("tut2").remove_from_group("selected")
+		for i in get_tree().get_nodes_in_group("forces"):
+			i.side = 1
+			i.remove_from_group("0")
+			i._ready()
 		playerUI.refresh()
+		await get_tree().process_frame
 		await get_tree().process_frame
 		playerUI.command()
 	elif tutorial_phase > 5:
@@ -275,10 +308,20 @@ func tutorial():
 		playerUI.available["UI_buttons"]["move"] = true
 		playerUI.available["UI_buttons"]["stop"] = true
 		playerUI.available["UI_buttons"]["defend"] = true
+		playerUI.available["selectmult"]["selectmult"] = true
 	if tutorial_phase == 6:
 		$Camera.position = Vector2(80, 530)
 		if !is_instance_valid(get_tree().get_first_node_in_group("tut3")):
 			tutorial_phase = 7
+			get_tree().get_first_node_in_group("tut4").side = 1
+			get_tree().get_first_node_in_group("tut4")._ready()
+			for u in get_tree().get_nodes_in_group("selected"):
+				u.selected = false
+				u.remove_from_group("selected")
+			playerUI.refresh()
+			await get_tree().process_frame
+			await get_tree().process_frame
+			playerUI.command()
 	if tutorial_phase == 7:
 		$Camera.position = Vector2(530, 20)
 		if get_tree().get_first_node_in_group("tut4").selected:
@@ -296,13 +339,13 @@ func tutorial():
 		playerUI.available["UI_buttons_build"]["build farm"] = true
 	if tutorial_phase == 9:
 		$Camera.position = Vector2(530, 20)
-		if get_tree().get_first_node_in_group("tut4").mode == "building":
+		if get_tree().get_first_node_in_group("tut4").mode == "build":
 			tutorial_phase = 10
 	if tutorial_phase == 10:
 		objectify()
 		if voicelines[0][1]:
 			voicelines[0][1] = false
-			playerUI.error(voicelines[0][0], 4)
+			playerUI.error(voicelines[0][0], 5)
 		playerUI.available["UI_buttons"]["create warrior"] = true
 		playerUI.available["UI_buttons"]["create archer"] = true
 		playerUI.available["UI_buttons"]["create cavalry"] = true
@@ -310,7 +353,14 @@ func tutorial():
 		playerUI.available["UI_buttons"]["rally"] = true
 		playerUI.available["UI_buttons_build"]["build barracks"] = true
 		playerUI.available["UI_buttons_build"]["build command centre"] = true
-		playerUI.available["UI_buttons_build"]["build watchtower"] = true
+		playerUI.available["UI_text"]["dragin"] = true
+		if get_tree().get_node_count_in_group("tut2") != 0 and get_tree().get_first_node_in_group("tut2").side != 1:
+			get_tree().get_first_node_in_group("tut2").side = 1
+			get_tree().get_first_node_in_group("tut2")._ready()
+		if get_tree().get_node_count_in_group("tut4") != 0 and get_tree().get_first_node_in_group("tut4").side != 1:
+			get_tree().get_first_node_in_group("tut4").side = 1
+			get_tree().get_first_node_in_group("tut4")._ready()
+			
 	else:
 		attack_timer = 0
 
@@ -324,13 +374,20 @@ func objectify():
 			if i.type == "barracks":
 				o[1] = false
 				playerUI.error(voicelines[3][0], 3)
+				if has_node("reinforcements"):
+					await get_tree().create_timer(8).timeout
+					playerUI.error(voicelines[6][0], 3)
 	o[2][0] = playerUI.currentsupply
-	if o[0][0] == 0 and !o[1] and !o[2][2]:
+	if o[0][0] == 0 and o[0][2]:
+		o[0][2] = false
+		playerUI.error(voicelines[4][0], 3)
+	if !o[0][2] and !o[1] and !o[2][2]:
 		o[3] = false
 	ob.visible = true
 	ob.text = "main objective:\n" + objectives["main"][0] 
-	if o[2][0] >= o[2][1]:
+	if o[2][0] >= o[2][1] and o[2][2]:
 		o[2][2] = false
+		playerUI.error(voicelines[5][0], 3)
 	if o[3]:
 		ob.text += "\nbonus objectives:"
 		if o[0][0] > 0:
@@ -339,11 +396,15 @@ func objectify():
 			ob.text += "\n" + objectives["bonus"][1]
 		else:
 			if o[2][0] < o[2][1] and o[2][2]:
-				ob.text += "\n" + objectives["bonus"][2] + str(o[2][0]) + "/" + str(o[2][1]) 
-				
+				ob.text += "\n" + objectives["bonus"][2] + str(o[2][0]) + "/" + str(o[2][1])
 
 
 func _on_skip_pressed() -> void:
+	if tutorial_phase < 5:
+		for i in get_tree().get_nodes_in_group("forces"):
+			i.side = 1
+			i.remove_from_group("0")
+			i._ready()
 	tutorial_phase = 10
 	$mission/mission/skip.visible = false
 	$mission/mission/tuttext.visible = false
@@ -351,11 +412,81 @@ func _on_skip_pressed() -> void:
 	await get_tree().process_frame
 	playerUI.command()
 
-
 func _on_reinforcements_body_entered(body: CharacterBody2D) -> void:
 	if body.is_in_group("1"):
 		$reinforcements.queue_free()
 		for i in get_tree().get_nodes_in_group("reinforced"):
 			i.side = 1
+			i.remove_from_group("0")
+			i.truehero = true
 			i._ready()
+		playerUI.available["UI_buttons_build"]["build hero altar"] = true
 		playerUI.error(voicelines[1][0], 2)
+		await get_tree().process_frame
+		await get_tree().process_frame
+		playerUI.command()
+
+func endit():
+	end.visible = true
+	end.player = 1
+	end.allplayers = 6
+	end.playernames = sidenames
+	var players = $C.get_children()
+	for i in players:
+		if str(i.name) != "aftergame stats":
+			end.stats[str(i.name)] = $C.get_node(str(i)).stats
+	var endobj = end.get_node("objectives")
+	if gamestate == -1:
+		end.victory = false
+		endobj.text = objectives["main"][0] + ": failed"
+	else:
+		endobj.text = objectives["main"][0] + ": done"
+	endobj.text += "\n"
+	endobj.text += objectives["bonus"][0] + str(objectives["objectives progress"][0][0]) + "/" + str(objectives["objectives progress"][0][1])
+	endobj.text += "\n"
+	if objectives["objectives progress"][1]:
+		endobj.text += objectives["bonus"][1] + ": failed"
+	else:
+		endobj.text += objectives["bonus"][1] + ": done"
+	endobj.text += "\n"
+	if objectives["objectives progress"][2][2]:
+		endobj.text += objectives["bonus"][2] + "failed"
+	else:
+		endobj.text += objectives["bonus"][2] + "done"
+	end.end()
+	get_tree().paused = true
+
+func handle_spawns():
+	period -= get_process_delta_time()
+	if period > 0:
+		return
+	if get_tree().get_node_count_in_group("bird") < 3:
+		var birdie = load("res://unit.tscn")
+		birdie = birdie.instantiate()
+		birdie.global_position = birdpathes.pick_random()
+		birdie.type = "bird"
+		birdie.add_to_group("bird")
+		birdie.side = 0
+		birdie.givesight = true
+		birdie.starting_health = 1.0
+		add_child(birdie)
+	for i in get_tree().get_nodes_in_group("bird"):
+		if i.mode == "idle":
+			i.mode = "move"
+			i.target = birdpathes.pick_random()
+	period = 3
+
+
+func _on_reinforcements_2_body_entered(body: Node2D) -> void:
+	if body.is_in_group("1"):
+		$reinforcements2.queue_free()
+		for i in get_tree().get_nodes_in_group("reinforced2"):
+			i.side = 1
+			i.remove_from_group("0")
+			i.truehero = true
+			i._ready()
+		playerUI.available["UI_buttons_build"]["build watchtower"] = true
+		playerUI.error(voicelines[7][0], 2)
+		await get_tree().process_frame
+		await get_tree().process_frame
+		playerUI.command()

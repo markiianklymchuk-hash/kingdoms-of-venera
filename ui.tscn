@@ -16,7 +16,6 @@ script = ExtResource("1_fyqef")
 supplylimit = 2
 
 [node name="UI_buttons" type="ColorRect" parent="." unique_id=147199771]
-visible = false
 z_index = -1
 layout_mode = 0
 offset_left = 592.0
@@ -44,6 +43,43 @@ autowrap_mode = 2
 layout_mode = 0
 offset_top = 100.0
 offset_right = 140.0
+offset_bottom = 200.0
+text = "train warrior
+50 lumber, 2 supply"
+autowrap_mode = 2
+
+[node name="revive hero 1" type="Button" parent="UI_buttons" unique_id=1140242494]
+layout_mode = 0
+offset_top = 100.0
+offset_right = 140.0
+offset_bottom = 200.0
+text = "train warrior
+50 lumber, 2 supply"
+autowrap_mode = 2
+
+[node name="summon the paladin" type="Button" parent="UI_buttons" unique_id=1889528240]
+layout_mode = 0
+offset_right = 140.0
+offset_bottom = 100.0
+text = "train warrior
+50 lumber, 2 supply"
+autowrap_mode = 2
+
+[node name="revive hero 2" type="Button" parent="UI_buttons" unique_id=648806987]
+layout_mode = 0
+offset_left = 140.0
+offset_top = 100.0
+offset_right = 280.0
+offset_bottom = 200.0
+text = "train warrior
+50 lumber, 2 supply"
+autowrap_mode = 2
+
+[node name="revive hero 3" type="Button" parent="UI_buttons" unique_id=511569486]
+layout_mode = 0
+offset_left = 280.0
+offset_top = 100.0
+offset_right = 420.0
 offset_bottom = 200.0
 text = "train warrior
 50 lumber, 2 supply"
@@ -114,6 +150,15 @@ offset_bottom = 200.0
 text = "gather"
 autowrap_mode = 2
 
+[node name="hero ability holy light" type="Button" parent="UI_buttons" unique_id=1491216789]
+layout_mode = 0
+offset_left = 140.0
+offset_top = 100.0
+offset_right = 280.0
+offset_bottom = 200.0
+text = "holy light"
+autowrap_mode = 2
+
 [node name="return" type="Button" parent="UI_buttons" unique_id=1627709719]
 layout_mode = 0
 offset_left = 280.0
@@ -155,7 +200,31 @@ disabled = true
 text = "dropoff point"
 autowrap_mode = 2
 
+[node name="regenerate" type="Button" parent="UI_buttons" unique_id=59382330]
+layout_mode = 0
+offset_top = 100.0
+offset_right = 140.0
+offset_bottom = 200.0
+disabled = true
+text = "regeneration"
+autowrap_mode = 2
+
 [node name="create" type="Control" parent="UI_buttons" unique_id=1361969146]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="worker" type="Control" parent="UI_buttons" unique_id=929324838]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="hero" type="Control" parent="UI_buttons" unique_id=50977957]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="revive" type="Control" parent="UI_buttons" unique_id=619188914]
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
@@ -235,6 +304,7 @@ theme_override_font_sizes/font_size = 32
 autowrap_mode = 2
 
 [node name="UI_buttons_build" type="ColorRect" parent="." unique_id=358292207]
+visible = false
 layout_mode = 0
 offset_left = 592.0
 offset_top = 448.0
@@ -287,6 +357,15 @@ text = "build watchtower
 100 lumber, +8 supply"
 autowrap_mode = 2
 
+[node name="build hero altar" type="Button" parent="UI_buttons_build" unique_id=1859474831]
+layout_mode = 0
+offset_left = 280.0
+offset_right = 420.0
+offset_bottom = 100.0
+text = "build watchtower
+100 lumber, +8 supply"
+autowrap_mode = 2
+
 [node name="UI_buttons_cancel" type="ColorRect" parent="." unique_id=1480274414]
 visible = false
 layout_mode = 0
@@ -305,7 +384,12 @@ offset_bottom = 200.0
 text = "cancel"
 autowrap_mode = 2
 
-[node name="selectmult" type="Button" parent="." unique_id=1194811943]
+[node name="selectmult" type="Control" parent="." unique_id=1927104565]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="selectmult" type="Button" parent="selectmult" unique_id=1194811943]
 layout_mode = 0
 offset_left = 592.0
 offset_top = 398.0
@@ -316,6 +400,8 @@ text = "select multiple "
 [connection signal="pressed" from="UI_buttons/move" to="." method="_move"]
 [connection signal="pressed" from="UI_buttons/build" to="." method="_on_build_pressed"]
 [connection signal="pressed" from="UI_buttons/create warrior" to="." method="_on_create_warrior_pressed"]
+[connection signal="pressed" from="UI_buttons/revive hero 1" to="." method="_on_revive_hero_1_pressed"]
+[connection signal="pressed" from="UI_buttons/summon the paladin" to="." method="_on_summon_the_paladin_pressed"]
 [connection signal="pressed" from="UI_buttons/create worker" to="." method="_on_create_worker_pressed"]
 [connection signal="pressed" from="UI_buttons/create archer" to="." method="_on_create_archer_pressed"]
 [connection signal="pressed" from="UI_buttons/create cavalry" to="." method="_on_create_cavalry_pressed"]
@@ -323,6 +409,7 @@ text = "select multiple "
 [connection signal="pressed" from="UI_buttons/continue building" to="." method="_on_continue_building_pressed"]
 [connection signal="pressed" from="UI_buttons/attack" to="." method="_on_attack_pressed"]
 [connection signal="pressed" from="UI_buttons/gather" to="." method="_on_gather_pressed"]
+[connection signal="pressed" from="UI_buttons/hero ability holy light" to="." method="_on_holy_light_pressed"]
 [connection signal="pressed" from="UI_buttons/return" to="." method="_on_return_pressed"]
 [connection signal="pressed" from="UI_buttons/stop" to="." method="_on_stop_pressed"]
 [connection signal="pressed" from="UI_buttons/defend" to="." method="_on_defend_pressed"]
@@ -334,5 +421,6 @@ text = "select multiple "
 [connection signal="pressed" from="UI_buttons_build/build command centre" to="." method="_on_build_command_centre_pressed"]
 [connection signal="pressed" from="UI_buttons_build/build farm" to="." method="_on_build_farm_pressed"]
 [connection signal="pressed" from="UI_buttons_build/build watchtower" to="." method="_on_build_watchtower_pressed"]
+[connection signal="pressed" from="UI_buttons_build/build hero altar" to="." method="_on_build_hero_altar_pressed"]
 [connection signal="pressed" from="UI_buttons_cancel/cancel" to="." method="_on_cancel_pressed"]
-[connection signal="pressed" from="selectmult" to="." method="_on_selectmult_pressed"]
+[connection signal="pressed" from="selectmult/selectmult" to="." method="_on_selectmult_pressed"]

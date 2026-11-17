@@ -40,6 +40,9 @@ func _draw():
 		else:
 			if is_instance_valid(wastarget):
 				draw_circle(wastarget.global_position - get_parent().position, 4, Color("003800ff"), false, 2)
+	if mode == "holy light" and selected:
+		if is_instance_valid(wastarget):
+			draw_circle(wastarget.global_position - get_parent().position, 4, Color("ffff00ff"), false, 2)
 	if mode == "gather" and is_instance_valid(wastarget):
 		if selected:
 			draw_circle(wastarget.global_position - get_parent().position, 4, Color("642c04ff"), false, 2)
@@ -56,7 +59,7 @@ func _draw():
 		if wasmode == "attack":
 			if wastarget is Vector2:
 				draw_circle(wastarget - get_parent().position, 4, Color("a6002bff"), false, 2)
-		if target is not Vector2:
+		if target is not Vector2 and is_instance_valid(target):
 			draw_circle(target.global_position - get_parent().position, 4, Color("a6002b99"), false, 2)
 	draw_line(Vector2(size/-2, size/-1), Vector2(size/2, size/-1), Color("ff0000dd"), 2.0)
 	draw_line(Vector2(size/-2, size/-1), Vector2(size/2 - size * (maxhp - hp)/maxhp, size/-1), Color("00ff00ff"), 2.0)

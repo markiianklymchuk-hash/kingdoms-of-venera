@@ -2,17 +2,33 @@
 
 [ext_resource type="Script" uid="uid://b27fqw6fv0t35" path="res://tutorial.gd" id="1_rwowx"]
 [ext_resource type="Script" uid="uid://3k4sc8xsl8jr" path="res://missiontut.gd" id="2_0cr88"]
+[ext_resource type="Script" uid="uid://f3qci0ryij8i" path="res://fog.gd" id="2_7vrqn"]
 [ext_resource type="PackedScene" uid="uid://bc7otib8b5y80" path="res://camera.tscn" id="2_ehuit"]
 [ext_resource type="PackedScene" uid="uid://ylww7nh4qfm0" path="res://ui.tscn" id="2_hu44a"]
+[ext_resource type="PackedScene" uid="uid://0kl8ohi3grsn" path="res://aftergame_stats.tscn" id="3_4t6hg"]
 [ext_resource type="PackedScene" uid="uid://c01elqunufra1" path="res://tree.tscn" id="3_ehuit"]
 [ext_resource type="PackedScene" uid="uid://fefgbbfg57pg" path="res://unit.tscn" id="5_hu44a"]
 [ext_resource type="PackedScene" uid="uid://4pqq5r5mc4t" path="res://tilemap.tscn" id="6_hu44a"]
 
+[sub_resource type="NavigationPolygon" id="NavigationPolygon_g7b7a"]
+vertices = PackedVector2Array(1947.9297, 1453.7734, -1454.1563, 1380.2031, -1493.8203, -963.0625, 1933.0625, -985.9297)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(-1504, -973, 1943, -996, 1958, 1464, -1464, 1390)])
+source_geometry_mode = 2
+source_geometry_group_name = &"nav"
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g7b7a"]
-size = Vector2(256.875, 149.625)
+size = Vector2(269.35938, 213.95313)
 
 [node name="tutorial" type="Node2D" unique_id=259766959]
 script = ExtResource("1_rwowx")
+
+[node name="fog" type="ColorRect" parent="." unique_id=594155907]
+script = ExtResource("2_7vrqn")
+
+[node name="navigation" type="NavigationRegion2D" parent="." unique_id=1266862420]
+visible = false
+navigation_polygon = SubResource("NavigationPolygon_g7b7a")
 
 [node name="mission" type="CanvasLayer" parent="." unique_id=846302763]
 
@@ -51,9 +67,9 @@ protect the civilians"
 
 [node name="skip" type="Button" parent="mission/mission" unique_id=419166113]
 layout_mode = 0
-offset_top = 150.0
+offset_top = 360.0
 offset_right = 90.0
-offset_bottom = 190.0
+offset_bottom = 400.0
 text = "skip"
 
 [node name="tilemap" parent="." unique_id=381311896 instance=ExtResource("6_hu44a")]
@@ -61,8 +77,14 @@ tile_map_data = PackedByteArray("AAAHAAkAAAAFAAAAAAAHAAgAAAAFAAAAAADp/8v/AAAFAAA
 
 [node name="C" type="CanvasLayer" parent="." unique_id=577988217]
 
+[node name="0" parent="C" unique_id=505982307 instance=ExtResource("2_hu44a")]
+lumber = 1000
+supplylimit = 100
+player = "0"
+metadata/_edit_use_anchors_ = true
+
 [node name="1" parent="C" unique_id=1042370251 instance=ExtResource("2_hu44a")]
-lumber = 200
+lumber = 25
 supplylimit = 100
 available = {
 &"UI_buttons": {
@@ -70,7 +92,7 @@ available = {
 &"build": false,
 &"cancel": false,
 &"continue building": false,
-&"create": true,
+&"create": false,
 &"create archer": false,
 &"create cavalry": false,
 &"create warrior": false,
@@ -88,10 +110,18 @@ available = {
 &"build barracks": false,
 &"build command centre": false,
 &"build farm": false,
-"build watchtower": false
+"build hero altar": false,
+&"build watchtower": false
 },
 &"UI_buttons_cancel": {
 &"cancel": true
+},
+&"UI_text": {
+&"dragin": false,
+&"next": true
+},
+&"selectmult": {
+&"selectmult": false
 }
 }
 
@@ -100,10 +130,13 @@ lumber = 1000
 supplylimit = 100
 player = "2"
 
-[node name="0" parent="C" unique_id=505982307 instance=ExtResource("2_hu44a")]
+[node name="6" parent="C" unique_id=258374719 instance=ExtResource("2_hu44a")]
 lumber = 1000
 supplylimit = 100
-player = "0"
+player = "2"
+
+[node name="aftergame stats" parent="C" unique_id=1423203062 instance=ExtResource("3_4t6hg")]
+visible = false
 
 [node name="Camera" parent="." unique_id=590716026 instance=ExtResource("2_ehuit")]
 position = Vector2(83, 528)
@@ -173,36 +206,38 @@ alllumber = 200.0
 [node name="unit" parent="." unique_id=1257042426 groups=["tut2"] instance=ExtResource("5_hu44a")]
 position = Vector2(543, -51)
 type = "command centre"
-side = 1
+givesight = true
 
-[node name="unit2" parent="." unique_id=74175154 instance=ExtResource("5_hu44a")]
+[node name="unit2" parent="." unique_id=74175154 groups=["forces"] instance=ExtResource("5_hu44a")]
 position = Vector2(527, 339)
-side = 1
 
-[node name="unit6" parent="." unique_id=1231320346 instance=ExtResource("5_hu44a")]
+[node name="unit6" parent="." unique_id=1231320346 groups=["forces"] instance=ExtResource("5_hu44a")]
 position = Vector2(397, -260)
-side = 1
+givesight = true
 
-[node name="unit17" parent="." unique_id=155880326 groups=["civilian"] instance=ExtResource("5_hu44a")]
-position = Vector2(700, -229)
+[node name="unit17" parent="." unique_id=155880326 groups=["civilian", "forces"] instance=ExtResource("5_hu44a")]
+position = Vector2(352, -188)
 type = "civilian"
+bounty = 10
 
-[node name="unit24" parent="." unique_id=500940050 groups=["civilian"] instance=ExtResource("5_hu44a")]
-position = Vector2(773, -246)
+[node name="unit24" parent="." unique_id=500940050 groups=["civilian", "reinforced2"] instance=ExtResource("5_hu44a")]
+position = Vector2(45, -567)
 type = "civilian"
+bounty = 10
 
-[node name="unit25" parent="." unique_id=557141993 groups=["civilian"] instance=ExtResource("5_hu44a")]
-position = Vector2(698, -286)
+[node name="unit25" parent="." unique_id=557141993 groups=["civilian", "forces"] instance=ExtResource("5_hu44a")]
+position = Vector2(555, 218)
 type = "civilian"
+bounty = 10
+givesight = true
 
-[node name="unit3" parent="." unique_id=1770684791 instance=ExtResource("5_hu44a")]
-position = Vector2(472, 228)
-side = 1
+[node name="unit3" parent="." unique_id=1770684791 groups=["forces"] instance=ExtResource("5_hu44a")]
+position = Vector2(453, 245)
 
 [node name="unit4" parent="." unique_id=1339092498 groups=["tut4"] instance=ExtResource("5_hu44a")]
 position = Vector2(381, -69)
 type = "worker"
-side = 1
+givesight = true
 
 [node name="unit5" parent="." unique_id=308717476 groups=["tut1"] instance=ExtResource("5_hu44a")]
 position = Vector2(676, -83)
@@ -299,6 +334,9 @@ side = 2
 [node name="unit9" parent="." unique_id=1906455824 groups=["army", "tut3", "ungardable"] instance=ExtResource("5_hu44a")]
 position = Vector2(-236, 646)
 side = 2
+bounty = 200
+givesight = true
+starting_health = 0.3
 
 [node name="unit10" parent="." unique_id=725660380 groups=["army", "ungardable"] instance=ExtResource("5_hu44a")]
 position = Vector2(-508, -124)
@@ -399,26 +437,71 @@ alllumber = 1200.0
 position = Vector2(-462, 805)
 type = "cavalry"
 side = 2
+bounty = 30
 
-[node name="unit27" parent="." unique_id=1077177118 groups=["civilian"] instance=ExtResource("5_hu44a")]
-position = Vector2(934, 288)
+[node name="unit36" parent="." unique_id=129011051 instance=ExtResource("5_hu44a")]
+position = Vector2(1123, 780)
+side = 6
+bounty = 20
+starting_health = 0.5
+
+[node name="unit27" parent="." unique_id=1077177118 groups=["civilian", "reinforced2"] instance=ExtResource("5_hu44a")]
+position = Vector2(97, -512)
 type = "civilian"
+bounty = 10
 
 [node name="unit29" parent="." unique_id=121769569 groups=["reinforced"] instance=ExtResource("5_hu44a")]
-position = Vector2(1078, 882)
+position = Vector2(1022, 891)
+type = "the paladin"
+truehero = false
+
+[node name="unit34" parent="." unique_id=2111450359 instance=ExtResource("5_hu44a")]
+position = Vector2(786, 977)
+side = 6
+bounty = 20
+starting_health = 0.4
+
+[node name="unit35" parent="." unique_id=1643704441 instance=ExtResource("5_hu44a")]
+position = Vector2(-349, 843)
+side = 6
+bounty = 20
+
+[node name="unit37" parent="." unique_id=550923514 instance=ExtResource("5_hu44a")]
+position = Vector2(-621, 740)
+side = 6
+bounty = 20
+
+[node name="unit38" parent="." unique_id=2014028112 instance=ExtResource("5_hu44a")]
+position = Vector2(702, -714)
+type = "archer"
+side = 6
+bounty = 20
+
+[node name="unit39" parent="." unique_id=759962039 instance=ExtResource("5_hu44a")]
+position = Vector2(1022, -620)
+type = "archer"
+side = 6
+bounty = 20
 
 [node name="unit30" parent="." unique_id=26695376 groups=["reinforced"] instance=ExtResource("5_hu44a")]
-position = Vector2(1089, 934)
+position = Vector2(1047, 969)
 type = "archer"
 
-[node name="unit28" parent="." unique_id=885526248 groups=["civilian"] instance=ExtResource("5_hu44a")]
-position = Vector2(860, 318)
+[node name="unit28" parent="." unique_id=885526248 groups=["civilian", "reinforced"] instance=ExtResource("5_hu44a")]
+position = Vector2(1077, 940)
 type = "civilian"
+bounty = 10
 
 [node name="reinforcements" type="Area2D" parent="." unique_id=60332898 groups=["reinforcements"]]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="reinforcements" unique_id=1049559814]
-position = Vector2(990, 944)
+position = Vector2(992.3203, 948.97656)
+shape = SubResource("RectangleShape2D_g7b7a")
+
+[node name="reinforcements2" type="Area2D" parent="." unique_id=1413344127 groups=["reinforcments2"]]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="reinforcements2" unique_id=629574844]
+position = Vector2(34, -504)
 shape = SubResource("RectangleShape2D_g7b7a")
 
 [node name="unit31" parent="." unique_id=1573428413 instance=ExtResource("5_hu44a")]
@@ -431,10 +514,11 @@ position = Vector2(-671, -435)
 type = "watchtower"
 side = 2
 
-[node name="unit33" parent="." unique_id=80617911 instance=ExtResource("5_hu44a")]
-position = Vector2(238, -530)
+[node name="unit33" parent="." unique_id=80617911 groups=["reinforced2"] instance=ExtResource("5_hu44a")]
+position = Vector2(-4, -494)
 type = "watchtower"
-side = 1
+givesight = true
 
 [connection signal="pressed" from="mission/mission/skip" to="." method="_on_skip_pressed"]
 [connection signal="body_entered" from="reinforcements" to="." method="_on_reinforcements_body_entered"]
+[connection signal="body_entered" from="reinforcements2" to="." method="_on_reinforcements_2_body_entered"]

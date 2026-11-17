@@ -5,11 +5,17 @@ var colors = {
 	"0" = Color("000000"),
 	"1" = Color("ff0000"),
 	"2" = Color("0000ff"),
-	"3" = Color("00ff00")
+	"3" = Color("00ff00"),
+	"4" = Color("ffff00"),
+	"5" = Color("ff7fffff"),
+	"6" = Color("404040ff"),
 }
 @export var type = ""
 @export var side = 0
-
+@export var bounty = 0
+@export var givesight = false
+@export var starting_health = 1.0
+@export var truehero = true
 var main 
 var pos = Vector2(0,0)
 var draww = {}
@@ -33,66 +39,108 @@ var what = null
 var BLOCK_MASK = 0b110
 var rally = null
 var scenario 
+var effex = []
+var possiblefx = ["regenerate", "dropoff point"]
+var searchtimer = 1
+var flying = false
+var abilitycds = [0,0,0,0,0,0,0,0]
+@onready var nav: NavigationAgent2D = $NavigationAgent2D
+var configured = false
+
+func _dir_to(point: Vector2) -> Vector2:
+	if building or flying:
+		return global_position.direction_to(point)
+	if nav.target_position.distance_to(point) > 16.0:
+		nav.target_position = point
+	if nav.is_navigation_finished():
+		return Vector2.ZERO
+	return global_position.direction_to(nav.get_next_path_position())
 
 func _ready() -> void:
 	main = get_parent().get_node("C/" + str(side))
 	scenario= get_parent()
+	if scenario.type == str(side):
+		givesight = true
 	if main.unit[type]["speed"] == 0:
 		building= true
 		set_collision_layer_value(2, true)
 	else:
 		building= false
 		set_collision_layer_value(1, true)
-	hp = main.unit[type]["health"]
+	queue_redraw()
+	hp = main.unit[type]["health"] * starting_health
+	starting_health = 1
 	add_to_group("unit")
 	add_to_group(str(side))
 	$colider.shape = $colider.shape.duplicate()
 	$colider.shape.radius = main.unit[type]["size"]
+	if main.unit[type]["commands"].has("dropoff point"):
+		manage_fx("add", "dropoff point", ["dropoff point"])
+	if building:
+		main.stats["buildings produced"] += 1
+	elif main.unit[type]["commands"].has("worker"):
+		main.stats["workers produced"] += 1
+	else:
+		main.stats["units produced"] += 1
+	flying = main.unit[type]["flying"]
+	main.check_for_heros()
+	await get_tree().physics_frame
+	if flying:
+		set_collision_layer_value(1, false)
+		set_collision_layer_value(2, false)
+		set_collision_layer_value(3, false)
+		set_collision_layer_value(4, true)
+		set_collision_mask_value(1, false)
+		set_collision_mask_value(2, false)
+		set_collision_mask_value(3, false)
+		set_collision_mask_value(4, true)
+		z_index = 1
+	else:
+		set_collision_layer_value(4, false)
+		set_collision_mask_value(4, false)
+	main.check_tree()
 
+
+func manage_fx(what_to_do, fx, description):
+	if what_to_do == "add":
+		if !effex.has(description) and possiblefx.has(fx):
+			effex.append(description)
+	if what_to_do == "dda":
+		if effex.has(description):
+			effex.erase(description)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	queue_redraw()
+func _physics_process(delta: float) -> void:
 	if alive:
 		cd -= delta
-		if is_main:
-			if queue.size() == 0:
-				main.get_node("UI_buttons/cancel").disabled = true
-			else:
-				main.get_node("UI_buttons/cancel").disabled = false
-			if carrying.size() == 0:
-				main.get_node("UI_buttons/return").disabled = true
-				main.get_node("UI_buttons/gather").disabled = false
-			else:
-				main.get_node("UI_buttons/return").disabled = false
-				main.get_node("UI_buttons/gather").disabled = true
 		handle_shit(delta)
 	else:
 		if mode == "cancel":
 			queue.clear()
 	if hp <= 0:
 		die()
+	if !alive and queue.is_empty():
+		die()
 	if !building:
 		move_and_slide()
-	if carrying.size() >= 1 and mode == "return":
-		set_collision_mask_value(1, false)
-		set_collision_layer_value(1, false)
-	else:
-		set_collision_mask_value(1, true)
-		set_collision_layer_value(1, true)
-			
+	if selected:
+		if !givesight and !main.fog.can_see(global_position):
+			selected = false
 
 func die():
-		queue_free()
-		if selected:
-			main.selectedall.erase(self)
-		for i in get_groups():
-			remove_from_group(i)
-		if queue.size() >= 1:
-			for i in queue:
-				queue.erase(i)
-				main.lumber += main.unit[type][i + " lumber"]
-			
+	queue_free()
+	if selected:
+		main.selectedall.erase(self)
+	for i in get_groups():
+		remove_from_group(i)
+	if queue.size() >= 1:
+		for i in queue:
+			queue.erase(i)
+			main.lumber += main.unit[type][i + " lumber"]
+	main.stats["units lost(in value)"] += main.unit[type]["value"]
+	main.stats["units lost"] += 1
+	main.check_tree()
+	main.check_for_heros()
 
 
 func learn():
@@ -101,6 +149,10 @@ func learn():
 	draww = main.draww
 
 func _draw() -> void:
+	if is_instance_valid(main.first) and main.first is Node2D and main.first == self:
+		is_main = true
+	else:
+		is_main = false
 	draw_circle(Vector2.ZERO, main.unit[type]["size"], colors[str(side)], true)
 	learn()
 	draw_colored_polygon(draww[type][0], draww[type][1])
@@ -130,6 +182,9 @@ func attack(who, how):
 			currently_attacking = false
 
 func search(how):
+	if searchtimer > 0:
+		searchtimer -= get_process_delta_time()
+		return
 	var all = get_tree().get_nodes_in_group("unit")
 	var best = null
 	for i in range(all.size()):
@@ -141,22 +196,25 @@ func search(how):
 		if global_position.distance_to(he.global_position) <= how:
 			if !is_friendly:
 				if best == null:
-					best = he
-				else:
-					if global_position.distance_to(best.global_position) > global_position.distance_to(he.global_position):
+					if can_target(he):
 						best = he
+				else:
+					if can_target(he):
+						if global_position.distance_to(best.global_position) > global_position.distance_to(he.global_position):
+							best = he
 	if best != null:
 		wasmode = mode
 		target = best
 		mode = "attack"
 		is_atacking_from_order = false
+	searchtimer = 1
 
 func search_for_dropoff():
 	var all = get_tree().get_nodes_in_group("unit")
 	var best = null
 	for i in range(all.size()):
 		var he = all[i]
-		if he.is_in_group(str(side)) and he.main.unit[he.type]["commands"].has("dropoff point"):
+		if he.is_in_group(str(side)) and he.effex.has(["dropoff point"]):
 			if best == null:
 				best = he
 			else:
@@ -167,6 +225,7 @@ func search_for_dropoff():
 		mode = "return"
 	else:
 		mode = "idle"
+	main.command()
 
 
 func search_for_resourse():
@@ -185,16 +244,38 @@ func search_for_resourse():
 		mode = "gather"
 	else:
 		mode = "idle"
+	main.command()
 	
 func damage():
-	var full_damage = max(main.unit[type]["damage"] * main.damage_matrix[target.main.unit[target.type]["armor type"]][main.unit[type]["damage type"]] - target.main.unit[target.type]["armor"], 0) 
+	var washp = target.hp
+	var full_damage = max(main.unit[type]["damage"] * main.damage_matrix[target.main.unit[target.type]["armor type"]][main.unit[type]["damage type"]], 0) 
 	target.hp -= full_damage
 	if target.hp <= 0:
-		target = null
 		mode = "idle"
 		currently_attacking = false
+		if washp > 0:
+			kill(target)
+		target = null
+
+func kill(who):
+	main.stats["units killed(in value)"] += main.unit[who.type]["value"]
+	main.stats["units killed"] += 1
+	get_mony(who.bounty)
+
+func apply_fx(typeis, delta):
+	if typeis == "everyframe":
+		for i in effex:
+			if i[0] == "regenerate":
+				heal(self, i[1] * delta)
+
+func heal(who, how_much):
+	who.hp += how_much
+	if who.hp > main.unit[who.type]["health"]:
+		who.hp = main.unit[who.type]["health"]
 
 func handle_shit(delta):
+	apply_fx("everyframe", delta)
+	abilityreload(delta)
 	if mode == "move":
 		progress = 0
 		if !main.unit[type]["commands"].has(mode):
@@ -207,17 +288,43 @@ func handle_shit(delta):
 			return
 		if target is Vector2:
 			wastarget = target
-			dir = global_position.direction_to(wastarget)
+			dir = _dir_to(wastarget)
 			if global_position.distance_to(wastarget) <= 16:
 				mode = "idle"
 		else:
 			if target == self:
 				mode = "idle"
 			wastarget= target
-			dir = global_position.direction_to(wastarget.global_position)
+			dir = _dir_to(wastarget.global_position)
 			if global_position.distance_to(wastarget.global_position) <= 1.5 * (main.unit[type]["size"] + main.unit[wastarget.type]["size"]):
 				dir = Vector2.ZERO
-		velocity = dir * main.unit[type]["speed"] * delta
+		velocity = dir * main.unit[type]["speed"]
+	if mode == "holy light":
+		progress = 0
+		wasmode = mode
+		currently_attacking = false
+		if target == null or target == self:
+			mode = "idle"
+			return
+		if abilitycds[main.unit[type][mode + " ability slot"]] > 0:
+			mode = "idle"
+			main.error("ability hasn't been recharged yet!", 1.0)
+			return
+		if  main.unit[type].keys().has(mode + " req"):
+			var s = false
+			if main.unit[type][mode + " req"][0] == "herolvl" and main.unit[type][mode + " req"][1] > main.herolvl:
+				s = true
+			if s:
+				mode = "idle"
+				return
+		wastarget= target
+		dir = _dir_to(wastarget.global_position)
+		if global_position.distance_to(wastarget.global_position) <= 1.5 * (main.unit[type]["size"] + main.unit[wastarget.type]["size"]):
+			dir = Vector2.ZERO
+			heal(target, main.unit[type]["holy light heal"])
+			abilitycds[main.unit[type][mode + " ability slot"]] = main.unit[type][mode + " cooldown"]
+			mode = "idle"
+		velocity = dir * main.unit[type]["speed"]
 	if mode == "gather":
 		wasmode = mode
 		currently_attacking = false
@@ -231,8 +338,8 @@ func handle_shit(delta):
 			wastarget = null
 			search_for_resourse()
 			return
-		dir = global_position.direction_to(wastarget.global_position)
-		if global_position.distance_to(wastarget.global_position) <= 45 + main.unit[type]["size"]:
+		dir = _dir_to(wastarget.global_position)
+		if global_position.distance_to(wastarget.global_position) <= 60 + main.unit[type]["size"]:
 			dir = Vector2.ZERO
 			progress += delta
 			if carrying.size() >= 1:
@@ -246,24 +353,25 @@ func handle_shit(delta):
 				return
 		else:
 			progress = 0
-		velocity = dir * main.unit[type]["speed"] * delta
+		velocity = dir * main.unit[type]["speed"]
 	if mode == "building":
 		wasmode = mode
 		currently_attacking = false
 		wastarget= target
 		if wastarget == null:
 			return
-		dir = global_position.direction_to(wastarget)
+		dir = _dir_to(wastarget)
 		if global_position.distance_to(wastarget) <= main.unit[what]["size"] + main.unit[type]["size"]:
 			if main.lumber >= main.unit[type][what + " lumber"]:
 				dir = Vector2.ZERO
 				build(what)
 				main.lumber -= main.unit[type][what + " lumber"]
+				main.stats["resources spent"] += main.unit[type][what + " lumber"]
 				what = null
 			elif main.lumber < main.unit[type][what + " lumber"]:
 				main.error("not enough lumber", 1)
 				mode = "idle"
-		velocity = dir * main.unit[type]["speed"] * delta
+		velocity = dir * main.unit[type]["speed"]
 	if mode == "build":
 		wasmode = mode
 		currently_attacking = false
@@ -273,38 +381,38 @@ func handle_shit(delta):
 			return
 		wastarget= target
 		progress = 0
-		dir = global_position.direction_to(wastarget.global_position)
+		dir = _dir_to(wastarget.global_position)
 		if global_position.distance_to(wastarget.global_position) <= main.unit[target.type]["size"] + main.unit[type]["size"] + 4:
 			dir = Vector2.ZERO
 			progress = 1
 			target.progress += delta
 			target.hp += main.unit[target.type]["health"] / main.unit[type][target.type + " time"] * delta
-			if target.queue.is_empty() and !target.alive:
-				target.hp = -10000
 			if target.progress >= main.unit[type][target.type + " time"] or target.alive:
 				target.progress = 0
 				target.alive = true
 				mode = "idle"
 				target.queue.clear()
+				target.main.check_tree()
+				target.main.check_for_heros()
 				main.command()
 				if target.hp > main.unit[target.type]["health"]:
 					target.hp = main.unit[target.type]["health"]
 				return
-		velocity = dir * main.unit[type]["speed"] * delta
+		velocity = dir * main.unit[type]["speed"]
 	if mode == "return":
 		wasmode = mode
 		currently_attacking = false
 		if target == null:
 			mode = "idle"
 			return
-		dir = global_position.direction_to(target.global_position)
+		dir = _dir_to(target.global_position)
 		if global_position.distance_to(target.global_position) <= 1.25 * (main.unit[type]["size"] + main.unit[target.type]["size"]):
 			dir = Vector2.ZERO
 			if carrying.has("lumber"):
 				carrying.erase("lumber")
-				main.lumber += main.unit[type]["how much"]
+				get_mony(main.unit[type]["how much"])
 				search_for_resourse()
-		velocity = dir * main.unit[type]["speed"] * delta
+		velocity = dir * main.unit[type]["speed"]
 	if mode == "idle":
 		progress = 0
 		wasmode = mode
@@ -318,9 +426,45 @@ func handle_shit(delta):
 		if queue.size() < 5 and main.lumber >= main.unit[type][what +" lumber"]:
 			queue.append(what)
 			main.lumber -= main.unit[type][what + " lumber"]
+			main.stats["resources spent"] += main.unit[type][what + " lumber"]
 			what = null
 		elif main.lumber < main.unit[type][what + " lumber"]:
 			main.error("not enough lumber", 1)
+		if queue.size() != 0:
+			mode = "buy"
+		else:
+			progress= 0
+			mode = "idle"
+		wasmode = mode
+		currently_attacking = false
+		velocity = Vector2(0,0)
+		attack(null, main.unit[type]["aggro"])
+	if mode == "summon":
+		wasmode = mode
+		currently_attacking = false
+		velocity = Vector2(0,0)
+		main.check_for_heros()
+		if queue.size() < 5 and main.lumber >= main.unit[type][what +" lumber"] and !main.heros.has(what):
+			queue.append(what)
+			main.lumber -= main.unit[type][what + " lumber"]
+			main.stats["resources spent"] += main.unit[type][what + " lumber"]
+			what = null
+		elif main.lumber < main.unit[type][what + " lumber"]:
+			main.error("not enough lumber", 1)
+		if queue.size() != 0:
+			mode = "buy"
+		else:
+			progress= 0
+			mode = "idle"
+	if mode == "revive":
+		wasmode = mode
+		currently_attacking = false
+		velocity = Vector2(0,0)
+		main.check_for_heros()
+		if !main.heros[what]:
+			if queue.size() < 5:
+				queue.append(what)
+				what = null
 		if queue.size() != 0:
 			mode = "buy"
 		else:
@@ -341,7 +485,9 @@ func handle_shit(delta):
 		currently_attacking = false
 		velocity = Vector2(0,0)
 		if queue.size() > 0:
-			main.lumber += main.unit[type][queue[queue.size() - 1] + " lumber"]
+			if main.unit[type].has(queue[queue.size() - 1] + " lumber"):
+				main.lumber += main.unit[type][queue[queue.size() - 1] + " lumber"]
+				main.stats["resources spent"] -= main.unit[type][queue[queue.size() - 1] + " lumber"]
 			queue.remove_at(queue.size() - 1)
 		if queue.size() != 0:
 			mode = "buy"
@@ -355,8 +501,12 @@ func handle_shit(delta):
 		if main.currentsupply - main.unit[queue[0]]["supply"] <= main.supply:
 			progress += delta
 		var first = queue[0]
-		if progress >= main.unit[type][first + " time"]:
-			create_unit(first)
+		if main.unit[type].has("hero time"):
+			if progress >= main.unit[type]["hero time"]:
+				create_unit(first)
+		else:
+			if progress >= main.unit[type][first + " time"]:
+				create_unit(first)
 		if queue.size() == 0:
 			mode = "idle"
 	if mode == "defence":
@@ -373,12 +523,15 @@ func handle_shit(delta):
 		if target is Vector2:
 			wasmode = mode
 			wastarget = target
-			dir = global_position.direction_to(wastarget)
+			dir = _dir_to(wastarget)
 			attack(null, main.unit[type]["aggro"])
 			if global_position.distance_to(wastarget) <= 16:
 				mode = "idle"
 		else:
 			if target.hp <= 0:
+				mode = "idle"
+				return
+			if !can_target(target):
 				mode = "idle"
 				return
 			if !is_atacking_from_order:
@@ -387,13 +540,13 @@ func handle_shit(delta):
 					return
 				else:
 					attack(null, main.unit[type]["aggro"])
-			dir = global_position.direction_to(target.global_position)
+			dir = _dir_to(target.global_position)
 			if global_position.distance_to(target.global_position) <= main.unit[type]["range"] + (main.unit[type]["size"] + main.unit[target.type]["size"]):
 				dir = Vector2.ZERO
 				attack(target, null)
 			else:
 				currently_attacking = false
-		velocity = dir * main.unit[type]["speed"] * delta
+		velocity = dir * main.unit[type]["speed"]
 
 func create_unit(unitt):
 	var who = load("res://unit.tscn").instantiate()
@@ -453,3 +606,20 @@ func check(world_pos: Vector2, size: float) -> bool:
 
 	var hits := get_world_2d().direct_space_state.intersect_shape(params, 1)
 	return hits.is_empty()
+
+func get_mony(how_much):
+	main.lumber += how_much
+	main.stats["resources gathered"] += how_much
+
+func can_target(he):
+	if he.flying and main.target_matrix[main.unit[type]["target"]][0]:
+		return true
+	elif !he.flying and !he.building and main.target_matrix[main.unit[type]["target"]][1]:
+		return true
+	elif he.building and main.target_matrix[main.unit[type]["target"]][2]:
+		return true
+	return false
+
+func abilityreload(delta):
+	for i in abilitycds.size():
+		abilitycds[i] -= delta
